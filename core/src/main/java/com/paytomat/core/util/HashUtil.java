@@ -18,6 +18,9 @@ package com.paytomat.core.util;
 
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 /**
  * Various hashing utilities used in the Bitcoin system.
@@ -77,5 +80,14 @@ public class HashUtil {
         byte[] sha256hash = sha256(data).getBytes();
         //3 - Perform RIPEMD-160 hashing on the result of SHA-256
         return ripemd160(sha256hash).getBytes();
+    }
+
+    public static byte[] hmacSha512(byte[] key, byte[] message) {
+        HMac hmac = new HMac(new SHA512Digest());
+        hmac.init(new KeyParameter(key));
+        hmac.update(message, 0, message.length);
+        byte[] result = new byte[hmac.getMacSize()];
+        hmac.doFinal(result, 0);
+        return result;
     }
 }

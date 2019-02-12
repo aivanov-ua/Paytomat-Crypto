@@ -12,12 +12,20 @@ public class BytesUtil {
         return ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
     }
 
+    public static ByteBuffer provideBufferBE(int size) {
+        return ByteBuffer.allocate(size).order(ByteOrder.BIG_ENDIAN);
+    }
+
     public static byte[] toBytesLE(short value) {
         return provideBufferLE(2).putShort(value).array();
     }
 
     public static byte[] toBytesLE(int value) {
         return provideBufferLE(4).putInt(value).array();
+    }
+
+    public static byte[] toBytesBE(int value) {
+        return provideBufferBE(4).putInt(value).array();
     }
 
     public static byte[] toBytesLE(long value) {
