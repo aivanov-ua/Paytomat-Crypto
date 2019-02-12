@@ -1,0 +1,6 @@
+apply plugin: 'java-library'
+
+dependencies {
+    api 'org.bouncycastle:bcprov-jdk15on:1.60'
+    api 'com.google.code.gson:gson:2.8.5'
+}
