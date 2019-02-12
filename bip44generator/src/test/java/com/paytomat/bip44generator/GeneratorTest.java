@@ -1,8 +1,6 @@
+package com.paytomat.bip44generator;
+
 import com.google.gson.Gson;
-import com.paytomat.bip44generator.Bip44Generator;
-import com.paytomat.bip44generator.HDNode;
-import com.paytomat.bip44generator.HDPath;
-import com.paytomat.bip44generator.MasterSeed;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;

@@ -5,6 +5,7 @@ import org.bouncycastle.util.encoders.Hex;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.paytomat.core.util.BytesUtil.toBytes;
 import static com.paytomat.core.util.BytesUtil.toBytesBE;
 import static com.paytomat.core.util.BytesUtil.toBytesLE;
 
@@ -44,6 +45,10 @@ public class ByteSerializer {
 
     public ByteSerializer writeLE(short value) {
         return write(toBytesLE(value));
+    }
+
+    public ByteSerializer write(int value) {
+        return write(toBytes(value));
     }
 
     public ByteSerializer writeLE(int value) {

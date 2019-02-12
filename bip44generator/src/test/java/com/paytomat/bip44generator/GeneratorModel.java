@@ -1,3 +1,5 @@
+package com.paytomat.bip44generator;
+
 import java.util.Objects;
 
 /**

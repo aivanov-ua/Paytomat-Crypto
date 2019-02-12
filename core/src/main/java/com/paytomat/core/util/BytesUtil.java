@@ -20,6 +20,10 @@ public class BytesUtil {
         return provideBufferLE(2).putShort(value).array();
     }
 
+    public static byte[] toBytes(int value) {
+        return ByteBuffer.allocate(4).putInt(value).array();
+    }
+
     public static byte[] toBytesLE(int value) {
         return provideBufferLE(4).putInt(value).array();
     }
