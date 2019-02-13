@@ -1,0 +1,8 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation project (':core')
+    implementation 'org.whispersystems:curve25519-java:0.4.0'
+
+    testImplementation 'junit:junit:4.12'
+}

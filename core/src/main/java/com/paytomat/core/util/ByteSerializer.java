@@ -2,9 +2,6 @@ package com.paytomat.core.util;
 
 import org.bouncycastle.util.encoders.Hex;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.paytomat.core.util.BytesUtil.toBytes;
 import static com.paytomat.core.util.BytesUtil.toBytesBE;
 import static com.paytomat.core.util.BytesUtil.toBytesLE;
@@ -18,17 +15,35 @@ public class ByteSerializer {
         return new ByteSerializer();
     }
 
-    private List<byte[]> bytesList = new ArrayList<>();
+    private byte[] bytes;
+    private int lastIndex = 0;
+
+
+    public ByteSerializer() {
+        this(0);
+    }
+
+    public ByteSerializer(int initialSize) {
+        this.bytes = new byte[initialSize];
+    }
+
+    private void ensureCapacity(int additionalBytes) {
+        if (bytes.length < lastIndex + additionalBytes) {
+            byte[] temp = new byte[lastIndex + additionalBytes];
+            System.arraycopy(bytes, 0, temp, 0, bytes.length);
+            this.bytes = temp;
+        }
+    }
 
     public ByteSerializer write(byte[] bytes, int offset, int count) {
-        byte[] res = new byte[count];
-        System.arraycopy(bytes, offset, res, 0, count);
-        return write(res);
+        ensureCapacity(count);
+        System.arraycopy(bytes, offset, this.bytes, lastIndex, count);
+        this.lastIndex += count;
+        return this;
     }
 
     public ByteSerializer write(byte[] bytes) {
-        this.bytesList.add(bytes);
-        return this;
+        return write(bytes, 0, bytes.length);
     }
 
     public ByteSerializer writeLE(byte[] bytes) {
@@ -98,17 +113,7 @@ public class ByteSerializer {
     }
 
     public byte[] serialize() {
-        int size = 0;
-        for (byte[] bytes : bytesList) {
-            size += bytes.length;
-        }
-        byte[] res = new byte[size];
-        int offset = 0;
-        for (byte[] bytes : bytesList) {
-            System.arraycopy(bytes, 0, res, offset, bytes.length);
-            offset += bytes.length;
-        }
-        return res;
+        return bytes;
     }
 
     @Override

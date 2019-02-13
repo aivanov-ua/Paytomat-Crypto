@@ -1,1 +1,1 @@
-include ':core', ':bip44generator', ':btc', ':eos', ':nem', ':tron'
+include ':core', ':bip44generator', ':btc', ':eos', ':nem', ':tron', ':waves'
