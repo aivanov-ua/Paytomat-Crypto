@@ -1,18 +1,12 @@
 package com.paytomat.nem.crypto;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import java.security.MessageDigest;
-import java.security.Security;
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.digests.KeccakDigest;
 
 /**
  * Static class that exposes hash functions.
  */
 public class Hashes {
-
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
     /**
      * Performs a SHA3-256 hash of the concatenated inputs.
@@ -22,7 +16,7 @@ public class Hashes {
      * @throws CryptoException if the hash operation failed.
      */
     public static byte[] sha3_256(final byte[]... inputs) {
-        return hash("Keccak-256", inputs);
+        return hash(new KeccakDigest(256), inputs);
     }
 
     /**
@@ -33,33 +27,16 @@ public class Hashes {
      * @throws CryptoException if the hash operation failed.
      */
     public static byte[] sha3_512(final byte[]... inputs) {
-        return hash("Keccak-512", inputs);
+        return hash(new KeccakDigest(512), inputs);
     }
 
-    /**
-     * Performs a RIPEMD160 hash of the concatenated inputs.
-     *
-     * @param inputs The byte arrays to concatenate and hash.
-     * @return The hash of the concatenated inputs.
-     * @throws CryptoException if the hash operation failed.
-     */
-    public static byte[] ripemd160(final byte[]... inputs) {
-        return hash("RIPEMD160", inputs);
-    }
 
-    private static byte[] hash(final String algorithm, final byte[]... inputs) {
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance(algorithm);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CryptoException(e);
-        }
-
+    private static byte[] hash(final Digest digest, final byte[]... inputs) {
         for (final byte[] input : inputs) {
-            digest.update(input);
+            digest.update(input, 0, input.length);
         }
-
-        return digest.digest();
+        byte[] result = new byte[digest.getDigestSize()];
+        digest.doFinal(result, 0);
+        return result;
     }
 }

@@ -1,5 +1,6 @@
 package com.paytomat.nem.model;
 
+import com.paytomat.core.util.HashUtil;
 import com.paytomat.nem.constants.NetworkVersion;
 import com.paytomat.nem.crypto.Hashes;
 import com.paytomat.nem.crypto.PublicKey;
@@ -105,7 +106,7 @@ public class Address implements Comparable<Address> {
         final byte[] sha3PublicKeyHash = Hashes.sha3_256(publicKey);
 
         // step 2: ripemd160 hash of (1)
-        final byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
+        final byte[] ripemd160StepOneHash = HashUtil.ripemd160(sha3PublicKeyHash).getBytes();
 
         // step 3: add version byte in front of (2)
         final byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[]{version}, ripemd160StepOneHash);
