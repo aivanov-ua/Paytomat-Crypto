@@ -124,7 +124,7 @@ public class HDNode {
         return new BigInteger(keyBytes);
     }
 
-    private byte[] getPublicKey() {
+    public byte[] getPublicKey() {
         if (publicKey == null) {
             Point Q = EcTools.multiply(Parameters.G, getPrivateKeyBigInt());
             // Convert Q to a compressed point on the curve
