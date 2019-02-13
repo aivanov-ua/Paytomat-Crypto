@@ -45,6 +45,7 @@ public class Base58 {
     private static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
 
     private static final int[] INDEXES = new int[128];
+
     static {
         for (int i = 0; i < INDEXES.length; i++) {
             INDEXES[i] = -1;
@@ -54,7 +55,9 @@ public class Base58 {
         }
     }
 
-    /** Encodes the given bytes in base58. No checksum is appended. */
+    /**
+     * Encodes the given bytes in base58. No checksum is appended.
+     */
     public static String encode(byte[] input) {
         if (input.length == 0) {
             return "";
@@ -144,6 +147,17 @@ public class Base58 {
         }
 
         return copyOfRange(temp, j - zeroCount, temp.length);
+    }
+
+    /**
+     * adds checksum to
+     */
+    public static String encodeWithChecksum(byte[] input) {
+        byte[] hash1 = HashUtil.doubleSha256(input).firstFourBytes();
+        byte[] inputCheck = new byte[input.length + 4];
+        System.arraycopy(input, 0, inputCheck, 0, input.length);
+        System.arraycopy(hash1, 0, inputCheck, input.length, 4);
+        return Base58.encode(inputCheck);
     }
 
     /**

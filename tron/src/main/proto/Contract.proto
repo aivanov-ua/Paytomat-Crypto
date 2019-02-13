@@ -1,0 +1,37 @@
+/*
+ * java-tron is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * java-tron is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package protocol;
+
+option java_package = "com.paytomat.tronj.protos"; //Specify the name of the package that generated the Java file
+option java_outer_classname = "Contract"; //Specify the class name of the generated Java file
+option go_package = "github.com/tronprotocol/grpc-gateway/core";
+
+import "Tron.proto";
+
+message TransferContract {
+    bytes owner_address = 1;
+    bytes to_address = 2;
+    int64 amount = 3;
+}
+
+message TransferAssetContract {
+    bytes asset_name = 1; // this field is token name before the proposal ALLOW_SAME_TOKEN_NAME is active, otherwise it is token id and token is should be in string format.
+    bytes owner_address = 2;
+    bytes to_address = 3;
+    int64 amount = 4;
+}
