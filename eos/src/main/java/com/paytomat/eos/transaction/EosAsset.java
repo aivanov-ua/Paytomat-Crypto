@@ -46,4 +46,13 @@ public class EosAsset implements Serializable {
                 .write(serializedSymbol())
                 .serialize();
     }
+
+    public static boolean validateEosSymbol(String symbol) {
+        int length = symbol.length();
+        if (length == 0 || length > 7) return false;
+        for (int i = 0; i < length; ++i) {
+            if (symbol.charAt(i) < 'A' || symbol.charAt(i) > 'Z') return false;
+        }
+        return true;
+    }
 }

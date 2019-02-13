@@ -33,15 +33,15 @@ public class EosTransactionHelper {
 
     //TX
     public static String createRawTx(PrivateKey pk, String from, String to, double amount,
-                                     String memo, String tokenAccount, byte tokenPrecision,
-                                     String chainIdHex, long currentTimeMillis, short refBlockNum,
-                                     int refBlockPrefix, String tokenSymbol) {
+                                     String tokenSymbol, String memo, String tokenAccount,
+                                     byte tokenPrecision, boolean isTestNet, long currentTimeMillis,
+                                     short refBlockNum, int refBlockPrefix) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(currentTimeMillis);
         calendar.add(Calendar.MINUTE, 5);
         long expiration = calendar.getTimeInMillis();
         return createRawTx(pk, from, to, amount, tokenSymbol, memo, tokenAccount, tokenPrecision,
-                chainIdHex, expiration, refBlockNum, refBlockPrefix);
+                isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET, expiration, refBlockNum, refBlockPrefix);
     }
 
     public static String createRawTx(PrivateKey pk, String from, String to, double amount,
