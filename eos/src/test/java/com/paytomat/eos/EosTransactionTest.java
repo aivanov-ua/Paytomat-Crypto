@@ -1,22 +1,18 @@
 package com.paytomat.eos;
 
 import com.google.gson.Gson;
-import com.payomat.eos.Eos;
-import com.payomat.eos.EosTransactionHelper;
-import com.payomat.eos.PrivateKey;
-import com.payomat.eos.PublicKey;
-import com.payomat.eos.signature.Signature;
-import com.payomat.eos.transaction.EosAction;
-import com.payomat.eos.transaction.EosAuthority;
-import com.payomat.eos.transaction.EosExtentionType;
-import com.payomat.eos.transaction.EosKeyWeight;
-import com.payomat.eos.transaction.EosPackedTransaction;
-import com.payomat.eos.transaction.EosPermissionLevelWeight;
-import com.payomat.eos.transaction.EosTransaction;
-import com.payomat.eos.transaction.EosTransactionCompression;
-import com.payomat.eos.transaction.EosWaitWeight;
-import com.payomat.eos.transaction.actiondata.NewAccountActionData;
-import com.payomat.eos.transaction.actiondata.TransactionActionData;
+import com.paytomat.eos.signature.Signature;
+import com.paytomat.eos.transaction.EosAction;
+import com.paytomat.eos.transaction.EosAuthority;
+import com.paytomat.eos.transaction.EosExtentionType;
+import com.paytomat.eos.transaction.EosKeyWeight;
+import com.paytomat.eos.transaction.EosPackedTransaction;
+import com.paytomat.eos.transaction.EosPermissionLevelWeight;
+import com.paytomat.eos.transaction.EosTransaction;
+import com.paytomat.eos.transaction.EosTransactionCompression;
+import com.paytomat.eos.transaction.EosWaitWeight;
+import com.paytomat.eos.transaction.actiondata.NewAccountActionData;
+import com.paytomat.eos.transaction.actiondata.TransactionActionData;
 
 import org.junit.Test;
 
