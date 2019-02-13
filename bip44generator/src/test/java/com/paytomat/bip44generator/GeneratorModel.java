@@ -46,7 +46,7 @@ public class GeneratorModel {
 
     @Override
     public String toString() {
-        return "EosSignatureModel{" +
+        return "Model{" +
                 "path='" + path + '\'' +
                 "mnemonic='" + mnemonic + '\'' +
                 ", privateKey='" + privateKey + '\'' +

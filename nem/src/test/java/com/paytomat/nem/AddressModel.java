@@ -1,4 +1,4 @@
-package com.paytomat.btc;
+package com.paytomat.nem;
 
 import java.util.Objects;
 
