@@ -45,7 +45,7 @@ public class TransferTransactionDraft extends AbstractTransactionDraft {
     @Override
     public Xems calculateMinimumFee() {
         int length = message != null && message.hasPayload() ? message.getPayload().length() : 0;
-        Mosaic mosaic = mosaics.length > 0 ? mosaics[0] : null;
+        Mosaic mosaic = mosaics != null && mosaics.length > 0 ? mosaics[0] : null;
         return FeeHelper.transferFee(mosaic, amount, length);
     }
 
