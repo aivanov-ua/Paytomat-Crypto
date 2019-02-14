@@ -22,7 +22,6 @@ import java.util.Calendar;
 
 import static com.paytomat.eos.Eos.CHAIN_ID_HEX_PRODNET;
 import static com.paytomat.eos.Eos.CHAIN_ID_HEX_TESTNET;
-import static com.paytomat.eos.Eos.CURRENCY_NAME;
 import static com.paytomat.eos.EosTransactionException.CODE_AMOUNT_TOO_SMALL;
 import static com.paytomat.eos.EosTransactionException.CODE_INVALID_PRODUCERS_AMOUNT;
 
@@ -36,18 +35,26 @@ public class EosTransactionHelper {
                                      String tokenSymbol, String memo, String tokenAccount,
                                      byte tokenPrecision, boolean isTestNet, long currentTimeMillis,
                                      short refBlockNum, int refBlockPrefix) {
+        return createRawTxWithExpiration(pk, from, to, amount, tokenSymbol, memo, tokenAccount, tokenPrecision,
+                isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET, currentTimeMillis, refBlockNum, refBlockPrefix);
+    }
+
+    public static String createRawTx(PrivateKey pk, String from, String to, double amount,
+                                     String tokenSymbol, String memo, String tokenAccount,
+                                     byte tokenPrecision, String chainIdHex, long currentTimeMillis,
+                                     short refBlockNum, int refBlockPrefix) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(currentTimeMillis);
         calendar.add(Calendar.MINUTE, 5);
         long expiration = calendar.getTimeInMillis();
-        return createRawTx(pk, from, to, amount, tokenSymbol, memo, tokenAccount, tokenPrecision,
-                isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET, expiration, refBlockNum, refBlockPrefix);
+        return createRawTxWithExpiration(pk, from, to, amount, tokenSymbol, memo, tokenAccount, tokenPrecision,
+                chainIdHex, expiration, refBlockNum, refBlockPrefix);
     }
 
-    public static String createRawTx(PrivateKey pk, String from, String to, double amount,
-                                     String currencyName, String memo, String tokenAccount,
-                                     byte tokenPrecision, String chainIdHex, long expirationDate,
-                                     short refBlockNum, int refBlockPrefix) {
+    public static String createRawTxWithExpiration(PrivateKey pk, String from, String to, double amount,
+                                                   String currencyName, String memo, String tokenAccount,
+                                                   byte tokenPrecision, String chainIdHex, long expirationDate,
+                                                   short refBlockNum, int refBlockPrefix) {
         if (amount <= 0) {
             throw new EosTransactionException("Amount is too small", CODE_AMOUNT_TOO_SMALL);
         }
@@ -79,20 +86,30 @@ public class EosTransactionHelper {
     //RESOURCES
     public static String applyResourceChange(PrivateKey pk, String from,
                                              int ramBytesDiff, double cpuStakeDiff, double bandwidthStakeDiff,
-                                             boolean isTestNet, long currentTimeMillis,
-                                             short refBlockNum, int refBlockPrefix) {
+                                             String currencyName, byte currencyPrecision,
+                                             boolean isTestNet, long currentTimeMillis, short refBlockNum, int refBlockPrefix) {
+        return applyResourceChangeWithExpiration(pk, from, ramBytesDiff, cpuStakeDiff, bandwidthStakeDiff,
+                currencyName, currencyPrecision, isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET,
+                currentTimeMillis, refBlockNum, refBlockPrefix);
+    }
+
+    public static String applyResourceChange(PrivateKey pk, String from,
+                                             int ramBytesDiff, double cpuStakeDiff, double bandwidthStakeDiff,
+                                             String currencyName, byte currencyPrecision,
+                                             String chainIdHex, long currentTimeMillis, short refBlockNum, int refBlockPrefix) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(currentTimeMillis);
         calendar.add(Calendar.MINUTE, 5);
         long expiration = calendar.getTimeInMillis();
-        return applyResourceChange(pk, from, ramBytesDiff, cpuStakeDiff, bandwidthStakeDiff,
-                isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET, expiration, refBlockNum, refBlockPrefix);
+        return applyResourceChangeWithExpiration(pk, from, ramBytesDiff, cpuStakeDiff, bandwidthStakeDiff,
+                currencyName, currencyPrecision, chainIdHex, expiration, refBlockNum, refBlockPrefix);
     }
 
-    private static String applyResourceChange(PrivateKey pk, String from,
-                                              int ramBytesDiff, double cpuStakeDiff, double bandwidthStakeDiff,
-                                              String chainIdHex, long expirationDate,
-                                              short refBlockNum, int refBlockPrefix) {
+    private static String applyResourceChangeWithExpiration(PrivateKey pk, String from,
+                                                            int ramBytesDiff, double cpuStakeDiff, double bandwidthStakeDiff,
+                                                            String currencyName, byte currencyPrecision,
+                                                            String chainIdHex, long expirationDate,
+                                                            short refBlockNum, int refBlockPrefix) {
         if (ramBytesDiff == 0 && cpuStakeDiff == 0 && bandwidthStakeDiff == 0) return "";
 
         EosAction ramChangeAction = null;
@@ -110,14 +127,14 @@ public class EosTransactionHelper {
         EosAction cpuChangeAction = null;
         if (bandwidthStakeDiff != 0) {
             if (Math.signum(bandwidthStakeDiff) == Math.signum(cpuStakeDiff)) {
-                bwChangeAction = createBwAction(from, CURRENCY_NAME, cpuStakeDiff, bandwidthStakeDiff, bandwidthStakeDiff > 0);
+                bwChangeAction = createBwAction(from, currencyName, currencyPrecision, cpuStakeDiff, bandwidthStakeDiff, bandwidthStakeDiff > 0);
             } else {
-                bwChangeAction = createBwAction(from, CURRENCY_NAME, 0, bandwidthStakeDiff, bandwidthStakeDiff > 0);
+                bwChangeAction = createBwAction(from, currencyName, currencyPrecision, 0, bandwidthStakeDiff, bandwidthStakeDiff > 0);
                 if (cpuStakeDiff != 0)
-                    cpuChangeAction = createBwAction(from, CURRENCY_NAME, cpuStakeDiff, 0, cpuStakeDiff > 0);
+                    cpuChangeAction = createBwAction(from, currencyName, currencyPrecision, cpuStakeDiff, 0, cpuStakeDiff > 0);
             }
         } else if (cpuStakeDiff != 0) {
-            cpuChangeAction = createBwAction(from, CURRENCY_NAME, cpuStakeDiff, 0, cpuStakeDiff > 0);
+            cpuChangeAction = createBwAction(from, currencyName, currencyPrecision, cpuStakeDiff, 0, cpuStakeDiff > 0);
         }
 
 
@@ -140,26 +157,39 @@ public class EosTransactionHelper {
                 new EosExtentionType[0]).toSignedJson();
     }
 
-    public static String buyRamForEos(PrivateKey privateKey, String from, boolean isTestNet,
-                                      long currentTimeMillis, short refBlockNum, int refBlockPrefix,
-                                      double eosRamStake) {
+    public static String buyRamForEos(PrivateKey privateKey, String from, double eosRamStake,
+                                      String currencyName, byte currencyPrecision, boolean isTestNet,
+                                      long currentTimeMillis, short refBlockNum, int refBlockPrefix) {
+        return buyRamForEos(privateKey, from, eosRamStake, currencyName, currencyPrecision,
+                isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET, currentTimeMillis, refBlockNum, refBlockPrefix);
+    }
+
+    public static String buyRamForEos(PrivateKey privateKey, String from, double eosRamStake,
+                                      String currencyName, byte currencyPrecision, String chainIdHex,
+                                      long currentTimeMillis, short refBlockNum, int refBlockPrefix) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(currentTimeMillis);
+        calendar.add(Calendar.MINUTE, 5);
+        long expiration = calendar.getTimeInMillis();
+        return buyRamForEosWithExpiration(privateKey, from, eosRamStake, currencyName, currencyPrecision,
+                chainIdHex, expiration, refBlockNum, refBlockPrefix);
+    }
+
+    public static String buyRamForEosWithExpiration(PrivateKey privateKey, String from, double eosRamStake,
+                                                    String currencyName, byte currencyPrecision, String chainIdHex,
+                                                    long expiration, short refBlockNum, int refBlockPrefix) {
         if (eosRamStake <= 0) {
             throw new EosTransactionException("Amount is too small", CODE_AMOUNT_TOO_SMALL);
         }
 
         EosAction txAction = EosAction.buyRamEos(new BuyRamEosActionData(from, from,
-                new EosAsset(eosRamStake, CURRENCY_NAME, Eos.CURRENCY_PRECISION)));
+                new EosAsset(eosRamStake, currencyName, currencyPrecision)));
 
         EosAction[] actionArray = new EosAction[1];
         actionArray[0] = txAction;
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(currentTimeMillis);
-        calendar.add(Calendar.MINUTE, 5);
-        long expiration = calendar.getTimeInMillis();
-
         return new EosTransaction(privateKey,
-                isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET,
+                chainIdHex,
                 expiration,
                 refBlockNum,
                 refBlockPrefix,
@@ -171,26 +201,27 @@ public class EosTransactionHelper {
                 new EosExtentionType[0]).toSignedJson();
     }
 
-    private static EosAction createBwAction(String from, String currencyName, double cpuStakeDiff,
-                                            double bandwidthStakeDiff, boolean delegate) {
+    private static EosAction createBwAction(String from, String currencyName, byte currencyPrecision,
+                                            double cpuStakeDiff, double bandwidthStakeDiff, boolean delegate) {
         cpuStakeDiff = Math.abs(cpuStakeDiff);
         bandwidthStakeDiff = Math.abs(bandwidthStakeDiff);
         if (delegate) return EosAction.delegateBw(new DelegateBwActionData(from,
                 from,
-                new EosAsset(bandwidthStakeDiff, currencyName, Eos.CURRENCY_PRECISION),
-                new EosAsset(cpuStakeDiff, currencyName, Eos.CURRENCY_PRECISION),
+                new EosAsset(bandwidthStakeDiff, currencyName, currencyPrecision),
+                new EosAsset(cpuStakeDiff, currencyName, currencyPrecision),
                 false));
         else return EosAction.undelegateBw(new UndelegateBwActionData(from,
                 from,
-                new EosAsset(bandwidthStakeDiff, currencyName, Eos.CURRENCY_PRECISION),
-                new EosAsset(cpuStakeDiff, currencyName, Eos.CURRENCY_PRECISION)));
+                new EosAsset(bandwidthStakeDiff, currencyName, currencyPrecision),
+                new EosAsset(cpuStakeDiff, currencyName, currencyPrecision)));
     }
 
     //NEW ACCOUNT
     public static EosTransaction createNewAccount(PrivateKey pk, String creator,
                                                   String accountName, String ownerPubKey, String activePubKey,
                                                   int ramBytes, double cpuStake, double bandwidthStake,
-                                                  boolean transferResources, long currentTimeMillis, String chainIdHex,
+                                                  boolean transferResources, long currentTimeMillis,
+                                                  String currencyName, byte currencyPrecision, String chainIdHex,
                                                   short refBlockNum, int refBlockPrefix) {
 
         EosKeyWeight keyWeightOwner = new EosKeyWeight(new PublicKey(ownerPubKey), (short) 1);
@@ -205,10 +236,9 @@ public class EosTransactionHelper {
                 new EosAuthority(1, keysActive, new EosPermissionLevelWeight[0], new EosWaitWeight[0]));
         BuyRamBytesActionData buyRamActionData = new BuyRamBytesActionData(creator, accountName, ramBytes);
         DelegateBwActionData delegateBwActionData = new DelegateBwActionData(creator, accountName,
-                new EosAsset(cpuStake, CURRENCY_NAME, Eos.CURRENCY_PRECISION),
-                new EosAsset(bandwidthStake, CURRENCY_NAME, Eos.CURRENCY_PRECISION),
+                new EosAsset(cpuStake, currencyName, currencyPrecision),
+                new EosAsset(bandwidthStake, currencyName, currencyPrecision),
                 transferResources);
-
 
         EosAction[] actionArray = new EosAction[3];
         actionArray[0] = EosAction.createNewAccount(newAccountActionData);
@@ -286,5 +316,4 @@ public class EosTransactionHelper {
                 actionArray,
                 new EosExtentionType[0]);
     }
-
 }

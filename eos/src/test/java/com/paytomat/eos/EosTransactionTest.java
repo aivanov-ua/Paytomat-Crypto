@@ -60,7 +60,7 @@ public class EosTransactionTest {
     public void testEosTransactionSingle() {
         PrivateKey privateKey = new PrivateKey("5JHfJNMtxGvg45F17UHC1xkdYR2BmKY2nrXrGPm12aNKEoXBfw3");
 
-        String tx = EosTransactionHelper.createRawTx(privateKey,
+        String tx = EosTransactionHelper.createRawTxWithExpiration(privateKey,
                 "paytomatios3",
                 "paytomatios",
                 45.0033,
@@ -111,7 +111,7 @@ public class EosTransactionTest {
     public void testEosTransactionSingleWithMemo() {
         PrivateKey privateKey = new PrivateKey("5K3e7MCue5NZpUHpp3zyB7jDg7vfukDSf9jn81qqPcH2WSjgwQg");
 
-        String tx = EosTransactionHelper.createRawTx(privateKey,
+        String tx = EosTransactionHelper.createRawTxWithExpiration(privateKey,
                 "paytomatios",
                 "paytomatios3",
                 256.0,
@@ -137,7 +137,7 @@ public class EosTransactionTest {
     public void testEosTransactionSubToken() {
         PrivateKey privateKey = new PrivateKey("5JHfJNMtxGvg45F17UHC1xkdYR2BmKY2nrXrGPm12aNKEoXBfw3");
 
-        String tx = EosTransactionHelper.createRawTx(privateKey,
+        String tx = EosTransactionHelper.createRawTxWithExpiration(privateKey,
                 "paytomatios3",
                 "paytomatios",
                 45.0033,
