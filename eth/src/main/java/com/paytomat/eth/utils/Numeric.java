@@ -33,6 +33,29 @@ public class Numeric {
         }
     }
 
+    public static byte[] toBytesPadded(BigInteger value, int length) {
+        byte[] result = new byte[length];
+        byte[] bytes = value.toByteArray();
+
+        int bytesLength;
+        int srcOffset;
+        if (bytes[0] == 0) {
+            bytesLength = bytes.length - 1;
+            srcOffset = 1;
+        } else {
+            bytesLength = bytes.length;
+            srcOffset = 0;
+        }
+
+        if (bytesLength > length) {
+            throw new RuntimeException("Input is too large to put in byte array of size " + length);
+        }
+
+        int destOffset = length - bytesLength;
+        System.arraycopy(bytes, srcOffset, result, destOffset, bytesLength);
+        return result;
+    }
+
     public static boolean containsHexPrefix(String input) {
         return !Strings.isEmpty(input) && input.length() > 1
                 && input.charAt(0) == '0' && input.charAt(1) == 'x';
@@ -75,6 +98,33 @@ public class Numeric {
         } else {
             return result;
         }
+    }
+
+    public static byte[] hexStringToByteArray(String input) {
+        String cleanInput = cleanHexPrefix(input);
+
+        int len = cleanInput.length();
+
+        if (len == 0) {
+            return new byte[] {};
+        }
+
+        byte[] data;
+        int startIdx;
+        if (len % 2 != 0) {
+            data = new byte[(len / 2) + 1];
+            data[0] = (byte) Character.digit(cleanInput.charAt(0), 16);
+            startIdx = 1;
+        } else {
+            data = new byte[len / 2];
+            startIdx = 0;
+        }
+
+        for (int i = startIdx; i < len; i += 2) {
+            data[(i + 1) / 2] = (byte) ((Character.digit(cleanInput.charAt(i), 16) << 4)
+                    + Character.digit(cleanInput.charAt(i + 1), 16));
+        }
+        return data;
     }
 
     public static String toHexString(byte[] input, int offset, int length, boolean withPrefix) {
