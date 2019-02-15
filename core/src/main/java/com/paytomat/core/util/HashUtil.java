@@ -21,6 +21,11 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.bouncycastle.util.encoders.Hex;
+
+import java.security.MessageDigest;
+import java.util.Arrays;
 
 /**
  * Various hashing utilities used in the Bitcoin system.
@@ -89,5 +94,24 @@ public class HashUtil {
         byte[] result = new byte[hmac.getMacSize()];
         hmac.doFinal(result, 0);
         return result;
+    }
+
+    public static byte[] sha3(byte[] input) {
+        MessageDigest digest = new Keccak.Digest256();
+        digest.update(input);
+        return digest.digest();
+    }
+
+    public static String sha3(String hexInput) {
+        byte[] bytes = Hex.decode(hexInput);
+        byte[] result = sha3(bytes);
+        return Hex.toHexString(result);
+    }
+
+    public static byte[] sha3omit12(byte[] input, byte prefix) {
+        byte[] hash = sha3(input);
+        byte[] address = Arrays.copyOfRange(hash, 11, hash.length);
+        address[0] = prefix;
+        return address;
     }
 }

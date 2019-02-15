@@ -1,7 +1,7 @@
 package com.paytomat.tron;
 
 import com.paytomat.core.util.Base58;
-import com.paytomat.tron.util.Hash;
+import com.paytomat.core.util.HashUtil;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -41,7 +41,7 @@ public class Address {
 
     public Address(PublicKey publicKey, byte networkHeader) {
         byte[] pubKeyBytes = publicKey.getPubKeyBytes();
-        this.addressBytes = Hash.sha3omit12(Arrays.copyOfRange(pubKeyBytes, 1, pubKeyBytes.length), networkHeader);
+        this.addressBytes = HashUtil.sha3omit12(Arrays.copyOfRange(pubKeyBytes, 1, pubKeyBytes.length), networkHeader);
     }
 
     public Address(String address, boolean isTestNet) {
