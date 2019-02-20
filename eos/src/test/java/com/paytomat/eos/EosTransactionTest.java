@@ -42,7 +42,7 @@ public class EosTransactionTest {
 
     @Test
     public void testEosSignature() throws IOException {
-        String fileData = readFile(getClass(), "eos_sign.txt");
+        String fileData = readFile();
         Gson gson = new Gson();
         String[] data = fileData.split("\n");
         for (int i = 0; i < data.length; i++) {
@@ -196,8 +196,8 @@ public class EosTransactionTest {
         assertEquals(expectedPackedTrx, tx.getPackedTx().getPackedTrx());
     }
 
-    private String readFile(Class javaClass, String fileName) throws IOException {
-        InputStream input = javaClass.getClassLoader().getResourceAsStream(fileName);
+    private String readFile() throws IOException {
+        InputStream input = getClass().getClassLoader().getResourceAsStream("eos_sign.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         StringBuilder out = new StringBuilder();
         String line = reader.readLine();

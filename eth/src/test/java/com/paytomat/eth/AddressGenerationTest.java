@@ -34,7 +34,7 @@ public class AddressGenerationTest {
     }
 
     private String readFile() throws IOException {
-        InputStream input = getClass().getClassLoader().getResourceAsStream("set.txt");
+        InputStream input = getClass().getResourceAsStream("/set.txt");
         if (input == null) return "";
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         StringBuilder out = new StringBuilder();

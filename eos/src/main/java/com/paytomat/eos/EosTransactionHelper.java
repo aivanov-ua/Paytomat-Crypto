@@ -35,7 +35,7 @@ public class EosTransactionHelper {
                                      String tokenSymbol, String memo, String tokenAccount,
                                      byte tokenPrecision, boolean isTestNet, long currentTimeMillis,
                                      short refBlockNum, int refBlockPrefix) {
-        return createRawTxWithExpiration(pk, from, to, amount, tokenSymbol, memo, tokenAccount, tokenPrecision,
+        return createRawTx(pk, from, to, amount, tokenSymbol, memo, tokenAccount, tokenPrecision,
                 isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET, currentTimeMillis, refBlockNum, refBlockPrefix);
     }
 
@@ -88,7 +88,7 @@ public class EosTransactionHelper {
                                              int ramBytesDiff, double cpuStakeDiff, double bandwidthStakeDiff,
                                              String currencyName, byte currencyPrecision,
                                              boolean isTestNet, long currentTimeMillis, short refBlockNum, int refBlockPrefix) {
-        return applyResourceChangeWithExpiration(pk, from, ramBytesDiff, cpuStakeDiff, bandwidthStakeDiff,
+        return applyResourceChange(pk, from, ramBytesDiff, cpuStakeDiff, bandwidthStakeDiff,
                 currencyName, currencyPrecision, isTestNet ? CHAIN_ID_HEX_TESTNET : CHAIN_ID_HEX_PRODNET,
                 currentTimeMillis, refBlockNum, refBlockPrefix);
     }
