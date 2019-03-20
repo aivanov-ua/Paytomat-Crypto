@@ -104,7 +104,7 @@ public class EosAction implements Serializable {
                 actionData.serialize());
     }
 
-    private EosAction(String account,
+    public EosAction(String account,
                       String name,
                       EosActionAuthorization[] authorization,
                       byte[] data) {
