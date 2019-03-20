@@ -4,6 +4,9 @@ import com.paytomat.eos.EosTransactionException;
 import com.paytomat.eos.transaction.EosAsset;
 import com.paytomat.core.util.ByteSerializer;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 import static com.paytomat.eos.Eos.encodeName;
 import static com.paytomat.eos.EosTransactionException.CODE_AMOUNT_TOO_SMALL;
 
@@ -32,8 +35,8 @@ public class TransactionActionData extends ActionData {
     @Override
     public byte[] serialize() {
         byte[] serializedMemoString = memo.getBytes();
-        double dust = Math.pow(0.1, quantity.currencyPrecision); // decimal 10^-4 causes overflow, but 0.1^4 is okay...
-        if (quantity.quantity < dust)
+        BigDecimal dust = BigDecimal.valueOf(10).pow(quantity.currencyPrecision * (-1), MathContext.DECIMAL128);
+        if (dust.compareTo(BigDecimal.valueOf(quantity.quantity)) > 0)
             throw new EosTransactionException("Quantity is smaller than dust", CODE_AMOUNT_TOO_SMALL);
 
         return new ByteSerializer()

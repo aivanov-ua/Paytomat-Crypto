@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/bip44generator/bip44generator.iml" filepath="$PROJECT_DIR$/bip44generator/bip44generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/btc/btc.iml" filepath="$PROJECT_DIR$/btc/btc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eos/eos.iml" filepath="$PROJECT_DIR$/eos/eos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eth/eth.iml" filepath="$PROJECT_DIR$/eth/eth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nem/nem.iml" filepath="$PROJECT_DIR$/nem/nem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/paytomat-crypto.iml" filepath="$PROJECT_DIR$/paytomat-crypto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tron/tron.iml" filepath="$PROJECT_DIR$/tron/tron.iml" />
+      <module fileurl="file://$PROJECT_DIR$/waves/waves.iml" filepath="$PROJECT_DIR$/waves/waves.iml" />
+    </modules>
+  </component>
+</project>
