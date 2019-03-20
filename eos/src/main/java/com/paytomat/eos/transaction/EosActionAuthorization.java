@@ -18,7 +18,7 @@ public class EosActionAuthorization implements Serializable {
         this.permission = permission;
     }
 
-    EosActionAuthorization(String actor, EosActionAuthorizationPermission permission) {
+    public EosActionAuthorization(String actor, EosActionAuthorizationPermission permission) {
         this(actor, permission.getValue());
     }
 
