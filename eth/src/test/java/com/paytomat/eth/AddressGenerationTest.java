@@ -7,10 +7,7 @@ import com.paytomat.eth.utils.Numeric;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * created by Alex Ivanov on 2019-02-12.
@@ -19,7 +16,7 @@ public class AddressGenerationTest {
 
     @Test
     public void testEthGen() throws IOException {
-        String fileData = readFile();
+        String fileData = FileUtil.readFile(getClass(), "set.txt");
         Gson gson = new Gson();
         String[] data = fileData.split("\n");
         for (int i = 0; i < data.length; i++) {
@@ -31,19 +28,5 @@ public class AddressGenerationTest {
             Assert.assertEquals(testModel.publicKey, Numeric.toHexStringWithPrefixZeroPadded(credentials.getEcKeyPair().getPublicKey(), 128));
             Assert.assertEquals(testModel.address, credentials.getAddress());
         }
-    }
-
-    private String readFile() throws IOException {
-        InputStream input = getClass().getResourceAsStream("/set.txt");
-        if (input == null) return "";
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        StringBuilder out = new StringBuilder();
-        String line = reader.readLine();
-        while (line != null) {
-            out.append(line).append("\n");
-            line = reader.readLine();
-        }
-        reader.close();
-        return out.toString();
     }
 }
