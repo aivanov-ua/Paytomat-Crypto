@@ -2,6 +2,7 @@ package com.paytomat.waves;
 
 import com.google.gson.Gson;
 import com.paytomat.core.util.Base58;
+import com.paytomat.core.util.HashUtil;
 
 import org.whispersystems.curve25519.Curve25519;
 
@@ -52,7 +53,7 @@ public class Transaction {
     }
 
     private static String hash(byte[] bytes) {
-        return Base58.encode(Hash.hash(bytes, 0, bytes.length, Hash.BLAKE2B256));
+        return Base58.encode(HashUtil.blake2b256(bytes, 0, bytes.length));
     }
 
     private static String sign(PrivateKeyAccount account, byte[] bytes) {
