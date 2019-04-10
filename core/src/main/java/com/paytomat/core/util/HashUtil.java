@@ -42,6 +42,12 @@ public class HashUtil {
         return HashBytes.of(result);
     }
 
+    public static void sha512(byte[] data, int dataLen, byte[] result) {
+        SHA512Digest digest = new SHA512Digest();
+        digest.update(data, 0, dataLen);
+        digest.doFinal(result, 0);
+    }
+
     public static HashBytes doubleSha256(byte[] data) {
         return doubleSha256(data, 0, data.length);
     }
