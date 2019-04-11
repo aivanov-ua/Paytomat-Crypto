@@ -11,4 +11,6 @@ public interface Constants {
     byte[] SIGN_PREFIX = new byte[]{9, (byte) 245, (byte) 205, (byte) 134, 18}; //edsig
     byte[] ADDRESS_PREFIX = new byte[]{6, (byte) 161, (byte) 159}; //tz1
 
+    int DECIMAL_DIGIT_COUNT = 6;
+
 }
