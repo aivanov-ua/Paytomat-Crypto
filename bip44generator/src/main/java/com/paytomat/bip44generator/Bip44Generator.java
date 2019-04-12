@@ -22,29 +22,29 @@ public class Bip44Generator {
     private static final String DEFAULT_CHARSET = "UTF-8";
 
     public static MasterSeed createRandomMasterSeed() {
-        byte[] rawEntropy = new byte[32];
+        return createRandomMasterSeed(24);
+    }
+
+    public static MasterSeed createRandomMasterSeed(int wordsCount) {
+        byte[] rawEntropy = new byte[wordsCount * 4 / 3];
         new SecureRandom().nextBytes(rawEntropy);
         String[] wordList = rawEntropyToWords(rawEntropy);
         return generateSeedFromWordList(wordList);
     }
 
     public static boolean isValidWordList(String[] wordList) {
-        if (wordList.length != 24) return false;
+        if (wordList.length != 12 &&
+                wordList.length != 15 &&
+                wordList.length != 18 &&
+                wordList.length != 21 &&
+                wordList.length != 24) return false;
+
         for (String word : wordList) {
             if (getWordIndex(word) == -1) return false;
         }
         byte[] bytes = wordListToBytes(wordList);
 
-        int checksumLength = 8;
-        byte[] raw = new byte[bytes.length - 1];
-        System.arraycopy(bytes, 0, raw, 0, raw.length);
-
-        byte[] checksumHash = HashUtil.sha256(raw).getBytes();
-        byte checksumByte = (byte) (((0xFF << (8 - checksumLength)) & 0xFF) & (0xFF & ((int) checksumHash[0])));
-
-        // Verify that the checksum is valid
-        byte c = bytes[bytes.length - 1];
-        return checksumByte == c;
+        return verifyChecksum(bytes);
     }
 
     public static MasterSeed generateSeedFromWordList(String[] wordList) {
@@ -66,12 +66,16 @@ public class Bip44Generator {
 
     public static String[] rawEntropyToWords(byte[] rawEntropy) {
         int bitLength = rawEntropy.length * 8;
-        if (bitLength != 256) {
-            throw new GeneratorException("Raw entropy must be 256 bits and not " + bitLength);
+        if (bitLength != 128 &&
+                bitLength != 160 &&
+                bitLength != 192 &&
+                bitLength != 224 &&
+                bitLength != 256) {
+            throw new RuntimeException("Raw entropy must be 128, 160, 192, 224, or 256 bits and not " + bitLength);
         }
 
         // Calculate the checksum
-        int checksumLength = 8;
+        int checksumLength = bitLength / 32;
         byte[] csHash = HashUtil.sha256(rawEntropy).getBytes();
         byte checksumByte = (byte) (((0xFF << (8 - checksumLength)) & 0xFF) & (0xFF & ((int) csHash[0])));
 
@@ -97,8 +101,12 @@ public class Bip44Generator {
     }
 
     private static byte[] wordListToBytes(String[] wordList) {
-        if (wordList.length != 24) {
-            throw new RuntimeException("Word list must be 24 words and not " + wordList.length);
+        if (wordList.length != 12 &&
+                wordList.length != 15 &&
+                wordList.length != 18 &&
+                wordList.length != 21 &&
+                wordList.length != 24) {
+            throw new RuntimeException("Word list must be 12, 15, 18, 21, or 24 words and not " + wordList.length);
         }
         int bitLength = wordList.length * 11;
         byte[] buf = new byte[bitLength / 8 + ((bitLength % 8) > 0 ? 1 : 0)];
@@ -154,5 +162,41 @@ public class Bip44Generator {
             }
         }
         return -1;
+    }
+
+    private static boolean verifyChecksum(byte[] rawAndChecksum) {
+        int bitLength = rawAndChecksum.length * 8;
+        int checksumLength;
+        switch (bitLength) {
+            case 128 + 8:
+                checksumLength = 4;
+                break;
+            case 160 + 8:
+                checksumLength = 5;
+                break;
+            case 192 + 8:
+                checksumLength = 6;
+                break;
+            case 224 + 8:
+                checksumLength = 7;
+                break;
+            case 256 + 8:
+                checksumLength = 8;
+                break;
+            default:
+                return false;
+        }
+
+        // Get the raw entropy
+        byte[] raw = new byte[rawAndChecksum.length - 1];
+        System.arraycopy(rawAndChecksum, 0, raw, 0, raw.length);
+
+        // Calculate checksum
+        byte[] csHash = HashUtil.sha256(raw).getBytes();
+        byte checksumByte = (byte) (((0xFF << (8 - checksumLength)) & 0xFF) & (0xFF & ((int) csHash[0])));
+
+        // Verify that the checksum is valid
+        byte c = rawAndChecksum[rawAndChecksum.length - 1];
+        return checksumByte == c;
     }
 }
