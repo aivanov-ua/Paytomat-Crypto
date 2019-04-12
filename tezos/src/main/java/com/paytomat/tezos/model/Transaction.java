@@ -35,6 +35,10 @@ public class Transaction {
         this.signature = signature;
     }
 
+    public String getSignature() {
+        return signature;
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("branch", branch);
