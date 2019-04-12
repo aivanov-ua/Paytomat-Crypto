@@ -16,6 +16,8 @@
 
 package com.paytomat.core.util;
 
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
@@ -38,6 +40,12 @@ public class HashUtil {
         byte[] result = new byte[32];
         digest.doFinal(result, 0);
         return HashBytes.of(result);
+    }
+
+    public static void sha512(byte[] data, int dataLen, byte[] result) {
+        SHA512Digest digest = new SHA512Digest();
+        digest.update(data, 0, dataLen);
+        digest.doFinal(result, 0);
     }
 
     public static HashBytes doubleSha256(byte[] data) {
@@ -113,5 +121,18 @@ public class HashUtil {
         byte[] address = Arrays.copyOfRange(hash, 11, hash.length);
         address[0] = prefix;
         return address;
+    }
+
+    public static byte[] blake2b256(byte[] input, int offset, int length) {
+        return blake2b(input, offset, length, 256);
+    }
+
+    public static byte[] blake2b(byte[] input, int offset, int length, int digestSize) {
+        final Digest alg = new Blake2bDigest(digestSize);
+
+        byte[] res = new byte[alg.getDigestSize()];
+        alg.update(input, offset, length);
+        alg.doFinal(res, 0);
+        return res;
     }
 }

@@ -54,4 +54,25 @@ public class BytesUtil {
     public static byte[] trimLeadingZeroes(byte[] bytes) {
         return trimLeadingBytes(bytes, (byte) 0);
     }
+
+    public static byte[] removeFromStart(byte[] bytes, int count) {
+        return removeRange(bytes, 0, count);
+    }
+
+    public static byte[] removeRange(byte[] bytes, int startIndex, int count) {
+        if (bytes == null || bytes.length <= count) return new byte[0];
+        byte[] newArray = new byte[bytes.length - count];
+
+        System.arraycopy(bytes, 0, newArray, 0, startIndex);
+        System.arraycopy(bytes, startIndex + count, newArray, startIndex, bytes.length - count - startIndex);
+        return newArray;
+    }
+
+    public static boolean startsWith(byte[] bytes, byte[] startsWith) {
+        if (bytes.length < startsWith.length) return false;
+        for (int i = 0; i < startsWith.length; i++) {
+            if (bytes[i] != startsWith[i]) return false;
+        }
+        return true;
+    }
 }

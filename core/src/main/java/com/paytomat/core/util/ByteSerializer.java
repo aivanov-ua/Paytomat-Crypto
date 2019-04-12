@@ -124,4 +124,8 @@ public class ByteSerializer {
     public String toBase58() {
         return Base58.encode(serialize());
     }
+
+    public String toBase58WithChecksum() {
+        return Base58.encodeWithChecksum(serialize());
+    }
 }
