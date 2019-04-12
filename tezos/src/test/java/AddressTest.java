@@ -37,4 +37,11 @@ public class AddressTest {
     public void testAddressFromBytes() {
         Assert.assertEquals(TEST_ADDRESS, new Address(Hex.decode("c83b9266f93eb6c67f32827cd86c8f374d7532af")).toString());
     }
+
+    @Test
+    public void testVerification() {
+        Assert.assertTrue(Address.verifyAddress("tz1dtmCcU7Ng29oWrEc5xJcrQfMnKgoqT7mn"));
+        Assert.assertFalse(Address.verifyAddress("tz2dtmCcU7Ng29oWrEc5xJcrQfMnKgoqT7mn"));
+        Assert.assertFalse(Address.verifyAddress("tz1dtmCcU7Ng29oWrEc5xJcrQfMnKgoqT6mn"));
+    }
 }

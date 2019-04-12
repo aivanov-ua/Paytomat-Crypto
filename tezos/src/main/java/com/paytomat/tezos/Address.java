@@ -10,6 +10,18 @@ import com.paytomat.core.util.HashUtil;
  */
 public class Address {
 
+    /**
+     * Validates address
+     *
+     * @param address address to validate
+     * @return if given address is valid
+     */
+    public static boolean verifyAddress(String address) {
+        byte[] addressBytes = Base58.decodeChecked(address);
+        if (addressBytes == null) return false;
+        return addressBytes.length == 20 + Constants.ADDRESS_PREFIX.length && BytesUtil.startsWith(addressBytes, Constants.ADDRESS_PREFIX);
+    }
+
     private byte[] addressBytes;
 
     public Address(byte[] addressBytes) {
