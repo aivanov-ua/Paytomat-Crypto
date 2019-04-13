@@ -15,27 +15,27 @@ import java.util.Map;
 public class Transaction {
 
     public static Transaction create(String branch, String protocol, Map<String, Object>[] operations, String dataToSign, SecretKey secretKey) {
-        String signature = Signature.signForgedOperation(Hex.decode(dataToSign), secretKey).edsig;
+        SignatureResult signatureResult = Signature.signForgedOperation(Hex.decode(dataToSign), secretKey);
         OperationWithCounter[] operationArray = new OperationWithCounter[operations.length];
         for (int i = 0; i < operations.length; i++) {
             operationArray[i] = new OperationWithCounter(operations[i]);
         }
-        return new Transaction(branch, protocol, operationArray, signature);
+        return new Transaction(branch, protocol, operationArray, signatureResult);
     }
 
     private final String branch;
     private final String protocol;
     private final OperationWithCounter[] operations;
-    private final String signature;
+    private final SignatureResult signature;
 
-    public Transaction(String branch, String protocol, OperationWithCounter[] operations, String signature) {
+    public Transaction(String branch, String protocol, OperationWithCounter[] operations, SignatureResult signature) {
         this.branch = branch;
         this.protocol = protocol;
         this.operations = operations;
         this.signature = signature;
     }
 
-    public String getSignature() {
+    public SignatureResult getSignature() {
         return signature;
     }
 
@@ -48,7 +48,7 @@ public class Transaction {
             contents[i] = operations[i].toMap();
         }
         map.put("contents", contents);
-        map.put("signature", signature);
+        map.put("signature", signature.edsig);
         return map;
     }
 
