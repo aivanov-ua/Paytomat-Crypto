@@ -42,6 +42,10 @@ public class Tez {
         return utezAmount.toString();
     }
 
+    public BigInteger getUtezAmount() {
+        return utezAmount;
+    }
+
     public String toDisplayString() {
         return new BigDecimal(utezAmount).divide(TEZ_IN_UTEZ, Constants.DECIMAL_DIGIT_COUNT, RoundingMode.DOWN).toPlainString();
     }
