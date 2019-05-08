@@ -50,6 +50,6 @@ public final class TimeValue implements Comparable<TimeValue> {
 
     @Override
     public String toString() {
-        return NumberUtils.toString(_seconds);
+        return Integer.toString(_seconds);
     }
 }

@@ -1,7 +1,5 @@
 package com.paytomat.nem.model;
 
-import com.paytomat.nem.utils.NumberUtils;
-
 /**
  * created by Alex Ivanov on 6/1/18.
  */
@@ -86,13 +84,9 @@ public class Xems {
         return (int) (amountMicro ^ (amountMicro >>> 32));
     }
 
-    public String toFractionalString() {
-        return NumberUtils.toAmountString(getAsFractional());
-    }
-
     @Override
     public String toString() {
-        return NumberUtils.toAmountString(getAsFractional());
+        return Double.toString(getAsFractional());
     }
 
 }
