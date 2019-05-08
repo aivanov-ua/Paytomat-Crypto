@@ -12,6 +12,7 @@ public class NumberUtils {
     private static NumberFormat getNFormatInstanceForCurrentLocale() {
         final NumberFormat instance = NumberFormat.getInstance(Locale.ENGLISH);
         instance.setRoundingMode(RoundingMode.DOWN);
+        instance.setGroupingUsed(false);
         return instance;
     }
 
