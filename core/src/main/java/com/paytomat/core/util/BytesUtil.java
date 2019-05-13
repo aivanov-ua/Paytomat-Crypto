@@ -75,4 +75,26 @@ public class BytesUtil {
         }
         return true;
     }
+
+    public static byte[] convertBits(byte[] fromBytes, int fromBits, int toBits, boolean pad) {
+        int acc = 0;
+        int bits = 0;
+        final int maxv = (1 << toBits) - 1;
+        final int maxAcc = (1 << (fromBits + toBits - 1)) - 1;
+        ByteSerializer out = new ByteSerializer();
+        for (byte value : fromBytes) {
+            acc = ((acc << fromBits) | (value & 0xFF)) & maxAcc;
+            bits += fromBits;
+            while (bits >= toBits) {
+                bits -= toBits;
+                out.write((byte) ((acc >> bits) & maxv));
+            }
+        }
+        if (pad) {
+            if (bits != 0) out.write((byte) ((acc >> bits) & maxv));
+        } else if (bits >= fromBits || ((acc << (toBits - bits)) & maxv) != 0) {
+            return null;
+        }
+        return out.serialize();
+    }
 }

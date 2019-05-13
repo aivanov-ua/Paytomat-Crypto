@@ -1,0 +1,21 @@
+apply plugin: 'java-library'
+apply plugin: 'com.google.protobuf'
+
+protobuf {
+    protoc {
+        // You still need protoc like in the non-Android case
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+}
+
+sourceSets{
+    main.java.srcDirs += "${protobuf.generatedFilesBaseDir}/main/java"
+}
+
+dependencies {
+    implementation project (':core')
+    implementation project (':btc')
+    implementation 'com.google.protobuf:protobuf-java:3.4.0'
+
+    testImplementation 'junit:junit:4.12'
+}
