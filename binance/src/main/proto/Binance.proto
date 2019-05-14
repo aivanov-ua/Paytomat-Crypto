@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package Binance.Proto;
+option java_package = "com.paytomat.binance.protos";
+
+message Transaction {
+    // int64 SIZE-OF-ENCODED      // varint encoded length of the structure after encoding
+    // 0xF0625DEE                  // prefix
+    repeated bytes msgs = 1; // array of size 1, containing the transaction message, which are one of the transaction type below
+    repeated bytes signatures = 2; // array of size 1, containing the standard signature structure of the transaction sender
+    string memo = 3; // a short sentence of remark for the transaction, only for `Transfer` transactions.
+    int64 source = 4; // an identifier for tools triggerring this transaction, set to zero if unwilling to disclose.
+    bytes data = 5; // reserved for future use
+}
+message Signature {
+    message PubKey {
+        // 0xEB5AE987          // prefix
+        // bytes               // public key bytes
+    }
+    bytes pub_key = 1; // public key bytes of the signer address
+    bytes signature = 2; // signature bytes, please check chain access section for signature generation
+    int64 account_number = 3; // another identifier of signer, which can be read from chain by account REST API or RPC
+    int64 sequence = 4; // sequence number for the next transaction
+}
+
+message SendOrder {
+    // 0x2A2C87FA
+    message Token {
+        string denom = 1;
+        int64 amount = 2;
+    }
+    message Input {
+        bytes address = 1;
+        repeated Token coins = 2;
+    }
+    message Output {
+        bytes address = 1;
+        repeated Token coins = 2;
+    }
+    repeated Input inputs = 1;
+    repeated Output outputs = 2;
+}

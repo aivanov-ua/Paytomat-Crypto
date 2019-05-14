@@ -1,5 +1,6 @@
 package com.paytomat.core.util;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -74,5 +75,54 @@ public class BytesUtil {
             if (bytes[i] != startsWith[i]) return false;
         }
         return true;
+    }
+
+    public static byte[] convertBits(byte[] fromBytes, int fromBits, int toBits, boolean pad) {
+        int acc = 0;
+        int bits = 0;
+        final int maxv = (1 << toBits) - 1;
+        final int maxAcc = (1 << (fromBits + toBits - 1)) - 1;
+        ByteSerializer out = new ByteSerializer();
+        for (byte value : fromBytes) {
+            acc = ((acc << fromBits) | (value & 0xFF)) & maxAcc;
+            bits += fromBits;
+            while (bits >= toBits) {
+                bits -= toBits;
+                out.write((byte) ((acc >> bits) & maxv));
+            }
+        }
+        if (pad) {
+            if (bits != 0) out.write((byte) ((acc >> bits) & maxv));
+        } else if (bits >= fromBits || ((acc << (toBits - bits)) & maxv) != 0) {
+            return null;
+        }
+        return out.serialize();
+    }
+
+    public static byte[] bigIntToBytes(BigInteger number, int numBytes) {
+        if (number.signum() < 0)
+            throw new IllegalArgumentException("number must be positive or zero");
+        if (numBytes <= 0) throw new IllegalArgumentException("num");
+        byte[] src = number.toByteArray();
+        byte[] dest = new byte[numBytes];
+        boolean isFirstByteOnlyForSign = src[0] == 0;
+        int length = isFirstByteOnlyForSign ? src.length - 1 : src.length;
+        if (length > numBytes)
+            throw new IllegalArgumentException("The given number does not fit in " + numBytes);
+        int srcPos = isFirstByteOnlyForSign ? 1 : 0;
+        int destPos = numBytes - length;
+        System.arraycopy(src, srcPos, dest, destPos, length);
+        return dest;
+    }
+
+    public static byte[] aminoWrap(byte[] raw, byte[] typePrefix, boolean isPrefixLength) {
+        int totalLen = raw.length + typePrefix.length;
+        VarLong varLong = new VarLong(totalLen);
+        if (isPrefixLength) totalLen += varLong.size();
+        ByteSerializer serializer = new ByteSerializer(totalLen);
+        if (isPrefixLength) serializer.write(new VarLong(raw.length + typePrefix.length).toBytes());
+        serializer.write(typePrefix);
+        serializer.write(raw);
+        return serializer.serialize();
     }
 }
