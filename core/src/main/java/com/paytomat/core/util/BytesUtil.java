@@ -1,5 +1,6 @@
 package com.paytomat.core.util;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -96,5 +97,21 @@ public class BytesUtil {
             return null;
         }
         return out.serialize();
+    }
+
+    public static byte[] bigIntToBytes(BigInteger number, int numBytes) {
+        if (number.signum() < 0)
+            throw new IllegalArgumentException("number must be positive or zero");
+        if (numBytes <= 0) throw new IllegalArgumentException("num");
+        byte[] src = number.toByteArray();
+        byte[] dest = new byte[numBytes];
+        boolean isFirstByteOnlyForSign = src[0] == 0;
+        int length = isFirstByteOnlyForSign ? src.length - 1 : src.length;
+        if (length > numBytes)
+            throw new IllegalArgumentException("The given number does not fit in " + numBytes);
+        int srcPos = isFirstByteOnlyForSign ? 1 : 0;
+        int destPos = numBytes - length;
+        System.arraycopy(src, srcPos, dest, destPos, length);
+        return dest;
     }
 }

@@ -1,9 +1,9 @@
 package com.paytomat.eos;
 
+import com.paytomat.core.util.HashUtil;
 import com.paytomat.eos.signature.ECDSA;
 import com.paytomat.eos.signature.ECSignature;
 import com.paytomat.eos.signature.Signature;
-import com.paytomat.core.util.HashUtil;
 
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
@@ -11,9 +11,9 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 
 import java.math.BigInteger;
 
+import static com.paytomat.core.util.BytesUtil.toBytesLE;
 import static com.paytomat.eos.EosTransactionException.CODE_WRONG_HASH_SIZE;
 import static com.paytomat.eos.EosTransactionException.CODE_WRONG_SIGNATURE_INPUT;
-import static com.paytomat.core.util.BytesUtil.toBytesLE;
 
 /**
  * created by Alex Ivanov on 2019-02-11.

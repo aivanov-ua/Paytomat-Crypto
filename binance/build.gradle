@@ -15,6 +15,7 @@ sourceSets{
 dependencies {
     implementation project (':core')
     implementation project (':btc')
+    implementation project (':eos')
     implementation 'com.google.protobuf:protobuf-java:3.4.0'
 
     testImplementation 'junit:junit:4.12'
