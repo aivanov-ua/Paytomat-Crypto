@@ -114,4 +114,15 @@ public class BytesUtil {
         System.arraycopy(src, srcPos, dest, destPos, length);
         return dest;
     }
+
+    public static byte[] aminoWrap(byte[] raw, byte[] typePrefix, boolean isPrefixLength) {
+        int totalLen = raw.length + typePrefix.length;
+        VarLong varLong = new VarLong(totalLen);
+        if (isPrefixLength) totalLen += varLong.size();
+        ByteSerializer serializer = new ByteSerializer(totalLen);
+        if (isPrefixLength) serializer.write(new VarLong(raw.length + typePrefix.length).toBytes());
+        serializer.write(typePrefix);
+        serializer.write(raw);
+        return serializer.serialize();
+    }
 }

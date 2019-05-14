@@ -41,6 +41,11 @@ public class Address {
         this.address = address;
     }
 
+    public byte[] getBytes() {
+        byte[] dec = Bech32.bech32Decode(address).getData();
+        return BytesUtil.convertBits(dec, 5, 8, false);
+    }
+
     @Override
     public String toString() {
         return address;
