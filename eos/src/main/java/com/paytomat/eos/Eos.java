@@ -51,14 +51,20 @@ public class Eos {
         return 0;
     }
 
-    public static Signature signTransactionRaw(byte[] inData, PrivateKey privateKey) {
+    public static Signature signTransactionRaw(byte[] message, PrivateKey privateKey) {
+        if (message == null || message.length == 0)
+            throw new EosTransactionException("Wrong input data", CODE_WRONG_SIGNATURE_INPUT);
+
+        byte[] data = HashUtil.sha256(message).getBytes();
+        return signTransactionHashed(data, privateKey);
+    }
+
+    public static Signature signTransactionHashed(byte[] data, PrivateKey privateKey) {
         PublicKey publicKey = privateKey.toPublicKey(true);
-        if (inData == null || inData.length == 0 || privateKey.isEmpty() || publicKey.isEmpty() ||
+        if (privateKey.isEmpty() || publicKey.isEmpty() ||
                 publicKey.getPublicKeyBytes().length != 33) {
             throw new EosTransactionException("Wrong input data", CODE_WRONG_SIGNATURE_INPUT);
         }
-
-        byte[] data = HashUtil.sha256(inData).getBytes();
         if (data.length != 32) {
             throw new EosTransactionException("dataSha256: 32 byte buffer required", CODE_WRONG_HASH_SIZE);
         }
