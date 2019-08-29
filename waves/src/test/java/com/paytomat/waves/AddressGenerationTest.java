@@ -17,7 +17,7 @@ import java.io.InputStreamReader;
 public class AddressGenerationTest {
 
     @Test
-    public void testTRONGen() throws IOException {
+    public void testWavesGen() throws IOException {
         String fileData = readFile();
         Gson gson = new Gson();
         String[] data = fileData.split("\n");

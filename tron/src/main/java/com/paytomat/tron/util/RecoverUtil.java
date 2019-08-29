@@ -1,6 +1,6 @@
 package com.paytomat.tron.util;
 
-import com.paytomat.tron.crypto.ECDSASignature;
+import com.paytomat.core.crypto.ECDSASignature;
 
 import org.bouncycastle.asn1.x9.X9IntegerConverter;
 import org.bouncycastle.math.ec.ECAlgorithms;

@@ -1,5 +1,6 @@
 package com.paytomat.eth.crypto;
 
+import com.paytomat.core.crypto.ECDSASignature;
 import com.paytomat.core.util.HashUtil;
 import com.paytomat.eth.utils.Numeric;
 

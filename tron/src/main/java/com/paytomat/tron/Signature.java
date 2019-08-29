@@ -1,6 +1,6 @@
 package com.paytomat.tron;
 
-import com.paytomat.tron.crypto.ECDSASignature;
+import com.paytomat.core.crypto.ECDSASignature;
 import com.paytomat.tron.util.RecoverUtil;
 
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -41,7 +41,7 @@ public class Signature {
                 (privateKey.getPrivateBigInt(), CurveConstants.CURVE);
         signer.init(true, privKeyParams);
         BigInteger[] components = signer.generateSignature(input);
-        return new ECDSASignature(components[0], components[1]).toCanonical();
+        return new ECDSASignature(components[0], components[1]).toCanonicalised();
     }
 
     /**

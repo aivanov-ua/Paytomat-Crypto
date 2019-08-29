@@ -2,7 +2,7 @@ package com.paytomat.btc.transaction;
 
 import com.paytomat.btc.Address;
 import com.paytomat.btc.BitcoinException;
-import com.paytomat.btc.Coin;
+import com.paytomat.btc.Convertor;
 import com.paytomat.core.util.HashUtil;
 
 import org.bouncycastle.asn1.ASN1Integer;
@@ -37,7 +37,7 @@ import static com.paytomat.btc.BitcoinException.CODE_WRONG_PUB_KEY;
  */
 public class TransactionHelper {
 
-    private static final long MAX_ALLOWED_FEE = Coin.parseValue("0.1", BigDecimal.valueOf(100_000_000));
+    private static final long MAX_ALLOWED_FEE = Convertor.parseValue("0.1", BigDecimal.valueOf(100_000_000));
 
     static final int SIGVERSION_BASE = 0;
     static final int SIGVERSION_WITNESS_V0 = 1;
@@ -114,7 +114,7 @@ public class TransactionHelper {
                 utxoValue += outputInfo.value;
             }
             int txLen = getMaxTxSize(unspentOutputs, 1, compressedPubKey);
-            fee = Coin.calcMinimumFee(feePerB, txLen);
+            fee = Convertor.calcMinimumFee(feePerB, txLen);
             amountToSend = utxoValue - fee;
         } else {
             for (UnspentOutputInfo outInfo : unspentOutputs) {
@@ -129,7 +129,7 @@ public class TransactionHelper {
                         change = 0;
                     }
                     int txLen = getMaxTxSize(unspentOutputs, change > 0 ? 2 : 1, compressedPubKey);
-                    tempFee = Coin.calcMinimumFee(feePerB, txLen);
+                    tempFee = Convertor.calcMinimumFee(feePerB, txLen);
                     if (tempFee == fee) break;
                 }
                 fee = tempFee;

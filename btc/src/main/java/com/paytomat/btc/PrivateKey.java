@@ -1,12 +1,11 @@
 package com.paytomat.btc;
 
 import com.paytomat.btc.network.NetworkParams;
-import com.paytomat.core.ec.EcTools;
-import com.paytomat.core.ec.Parameters;
-import com.paytomat.core.ec.Point;
+import com.paytomat.core.Constants;
 import com.paytomat.core.util.Base58;
 import com.paytomat.core.util.HashUtil;
 
+import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
@@ -61,12 +60,8 @@ public class PrivateKey {
 
     public PublicKey getPublicKey() {
         if (publicKey == null) {
-            Point Q = EcTools.multiply(Parameters.G, getBigInteger());
-            if (isCompressed) {
-                // Convert Q to a compressed point on the curve
-                Q = new Point(Q.getCurve(), Q.getX(), Q.getY(), true);
-            }
-            publicKey = new PublicKey(Q.getEncoded());
+            ECPoint Q = Constants.SECP256k1_CURVE.getG().multiply(getBigInteger());
+            publicKey = new PublicKey(Q.getEncoded(isCompressed));
         }
         return publicKey;
     }

@@ -1,6 +1,9 @@
 package com.paytomat.core.crypto;
 
+import com.paytomat.core.util.ByteSerializer;
 import com.paytomat.core.util.BytesUtil;
+
+import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 
@@ -12,7 +15,19 @@ import static com.paytomat.core.Constants.SECP256k1_HALF_ORDER;
  */
 public class ECDSASignature {
 
+    public static ECDSASignature fromComponents(byte[] r, byte[] s) {
+        return new ECDSASignature(new BigInteger(1, r),
+                new BigInteger(1, s));
+    }
+
+    public static ECDSASignature fromComponents(byte[] r, byte[] s, byte v) {
+        ECDSASignature signature = fromComponents(r, s);
+        signature.v = v;
+        return signature;
+    }
+
     public final BigInteger r, s;
+    public byte v;
 
     /**
      * Constructs a signature with the given components. Does NOT automatically canonicalise the signature.
@@ -55,5 +70,21 @@ public class ECDSASignature {
         System.arraycopy(BytesUtil.bigIntToBytes(r, 32), 0, result, 0, 32);
         System.arraycopy(BytesUtil.bigIntToBytes(s, 32), 0, result, 32, 32);
         return result;
+    }
+
+    public byte[] toByteArray() {
+        final byte fixedV = this.v >= 27
+                ? (byte) (this.v - 27)
+                : this.v;
+
+        return ByteSerializer.create()
+                .write(this.r, 32)
+                .write(this.s, 32)
+                .write(fixedV)
+                .serialize();
+    }
+
+    public String toHex() {
+        return Hex.toHexString(toByteArray());
     }
 }

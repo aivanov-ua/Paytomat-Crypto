@@ -1,5 +1,6 @@
 package com.paytomat.eth.crypto;
 
+import com.paytomat.core.crypto.ECDSASignature;
 import com.paytomat.eth.utils.Numeric;
 
 import org.bouncycastle.crypto.digests.SHA256Digest;

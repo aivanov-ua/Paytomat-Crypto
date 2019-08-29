@@ -1,10 +1,10 @@
 package com.paytomat.bip44generator;
 
-import com.paytomat.core.ec.EcTools;
-import com.paytomat.core.ec.Parameters;
-import com.paytomat.core.ec.Point;
+import com.paytomat.core.Constants;
 import com.paytomat.core.util.ByteSerializer;
 import com.paytomat.core.util.HashUtil;
+
+import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +28,7 @@ public class HDNode {
         // Construct private key
         byte[] IL = Arrays.copyOf(I, 32);
         BigInteger k = new BigInteger(1, IL);
-        if (k.compareTo(Parameters.n) >= 0) {
+        if (k.compareTo(Constants.SECP256k1_PARAMS.getN()) >= 0) {
             throw new GeneratorException("An unlikely thing happened: The derived key is larger than the N modulus of the curve");
         }
         if (k.equals(BigInteger.ZERO)) {
@@ -86,13 +86,13 @@ public class HDNode {
         byte[] lR = Arrays.copyOfRange(l, 32, 64);
 
         BigInteger m = new BigInteger(1, lL);
-        if (m.compareTo(Parameters.n) >= 0) {
+        if (m.compareTo(Constants.SECP256k1_PARAMS.getN()) >= 0) {
             throw new GeneratorException(
                     "An unlikely thing happened: A key derivation parameter is larger than the N modulus of the curve");
         }
 
         BigInteger kPar = new BigInteger(1, privateKey);
-        BigInteger k = m.add(kPar).mod(Parameters.n);
+        BigInteger k = m.add(kPar).mod(Constants.SECP256k1_PARAMS.getN());
         if (k.equals(BigInteger.ZERO)) {
             throw new GeneratorException("An unlikely thing happened: The derived key is zero");
         }
@@ -126,10 +126,9 @@ public class HDNode {
 
     public byte[] getPublicKey() {
         if (publicKey == null) {
-            Point Q = EcTools.multiply(Parameters.G, getPrivateKeyBigInt());
+            ECPoint Q = Constants.SECP256k1_CURVE.getG().multiply(getPrivateKeyBigInt());
             // Convert Q to a compressed point on the curve
-            Q = new Point(Q.getCurve(), Q.getX(), Q.getY(), true);
-            publicKey = Q.getEncoded();
+            publicKey = Q.getEncoded(true);
         }
         return publicKey;
     }

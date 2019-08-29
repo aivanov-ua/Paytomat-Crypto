@@ -2,6 +2,8 @@ package com.paytomat.core.util;
 
 import org.bouncycastle.util.encoders.Hex;
 
+import java.math.BigInteger;
+
 import static com.paytomat.core.util.BytesUtil.toBytes;
 import static com.paytomat.core.util.BytesUtil.toBytesBE;
 import static com.paytomat.core.util.BytesUtil.toBytesLE;
@@ -106,6 +108,10 @@ public class ByteSerializer {
             write(item.serialize());
         }
         return this;
+    }
+
+    public ByteSerializer write(BigInteger bigInteger, int numBytes) {
+        return write(BytesUtil.bigIntToBytes(bigInteger, numBytes));
     }
 
     public ByteSerializer writeHex(String hex) {

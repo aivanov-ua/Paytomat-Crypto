@@ -1,7 +1,7 @@
 package com.paytomat.btc.transaction;
 
 import com.paytomat.btc.BitcoinException;
-import com.paytomat.btc.Coin;
+import com.paytomat.btc.Convertor;
 import com.paytomat.btc.KeyPair;
 import com.paytomat.btc.PrivateKey;
 
@@ -91,7 +91,7 @@ public class UnspentOutputInfo {
         }
 
         public Builder withValue(String value) {
-            return withValue(Coin.parseValue(value, BigDecimal.valueOf(100_000_000)));
+            return withValue(Convertor.parseValue(value, BigDecimal.valueOf(100_000_000)));
         }
 
         public Builder withOutputIndex(int outputIndex) {

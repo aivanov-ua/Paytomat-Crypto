@@ -7,7 +7,7 @@ import java.math.RoundingMode;
 /**
  * created by Alex Ivanov on 2019-02-12.
  */
-public class Coin {
+public class Convertor {
 
     public static long parseValue(String valueStr, BigDecimal precision) {
         try {

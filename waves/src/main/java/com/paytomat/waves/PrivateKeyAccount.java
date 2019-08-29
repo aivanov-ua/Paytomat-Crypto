@@ -1,6 +1,5 @@
 package com.paytomat.waves;
 
-
 import org.whispersystems.curve25519.java.curve_sigs;
 
 import java.util.Arrays;

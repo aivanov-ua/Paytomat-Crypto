@@ -2,8 +2,10 @@ package com.paytomat.bip44generator;
 
 import com.paytomat.core.util.HashUtil;
 
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.util.DigestFactory;
+
 import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.text.Normalizer;
 import java.util.Arrays;
@@ -15,7 +17,7 @@ import static com.paytomat.bip44generator.Constants.ENGLISH_WORD_LIST;
  */
 public class Bip44Generator {
 
-    private static final String ALGORITHM = "HmacSHA512";
+    private static final Digest ALGORITHM = DigestFactory.createSHA512();
     private static final int REPETITIONS = 2048;
     private static final int BIP32_SEED_LENGTH = 64;
     private static final String BASE_SALT = "mnemonic";
@@ -57,8 +59,8 @@ public class Bip44Generator {
         byte[] seed;
         try {
             byte[] saltBytes = Normalizer.normalize(BASE_SALT, Normalizer.Form.NFKD).getBytes(DEFAULT_CHARSET);
-            seed = PBKDF.pbkdf2(ALGORITHM, menemonic.getBytes(DEFAULT_CHARSET), saltBytes, REPETITIONS, BIP32_SEED_LENGTH);
-        } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+            seed = HashUtil.pbkdf2(ALGORITHM, menemonic.toCharArray(), saltBytes, REPETITIONS, BIP32_SEED_LENGTH);
+        } catch (UnsupportedEncodingException e) {
             throw new GeneratorException(e.getMessage());
         }
         return new MasterSeed(wordList, seed);

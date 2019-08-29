@@ -5,3 +5,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 }
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${projectDir}/out/test/resources"
+}

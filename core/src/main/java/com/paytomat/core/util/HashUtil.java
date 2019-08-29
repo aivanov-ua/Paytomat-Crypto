@@ -17,10 +17,12 @@
 package com.paytomat.core.util;
 
 import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
@@ -134,5 +136,11 @@ public class HashUtil {
         alg.update(input, offset, length);
         alg.doFinal(res, 0);
         return res;
+    }
+
+    public static byte[] pbkdf2(Digest mac, char[] P, byte[] salt, int c, int dkLen) {
+        PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(mac);
+        generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(P), salt, c);
+        return ((KeyParameter) generator.generateDerivedParameters(dkLen * 8)).getKey();
     }
 }
