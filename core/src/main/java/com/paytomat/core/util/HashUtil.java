@@ -71,23 +71,6 @@ public class HashUtil {
         return new HashBytes(out);
     }
 
-    /**
-     * Calculate the RipeMd160 value of the SHA-256 of an array of bytes. This is
-     * how a Bitcoin address is derived from public key bytes.
-     *
-     * @param pubkeyBytes A Bitcoin public key as an array of bytes.
-     * @return The Bitcoin address as an array of bytes.
-     */
-    public static byte[] addressHash(byte[] pubkeyBytes) {
-        byte[] sha256 = sha256(pubkeyBytes).getBytes();
-        byte[] out = new byte[20];
-        RIPEMD160Digest ripeMD160 = new RIPEMD160Digest();
-        ripeMD160.update(sha256, 0, sha256.length);
-        ripeMD160.doFinal(out, 0); // This also resets the hash function for
-        // next use
-        return out;
-    }
-
     public static byte[] sha256ripemd160(byte[] data) {
         //https://en.bitcoin.it/wiki/Technical_background_of_Bitcoin_addresses
         //1 - Take the corresponding public key generated with it (65 bytes, 1 byte 0x04, 32 bytes corresponding to X coordinate, 32 bytes corresponding to Y coordinate)

@@ -15,7 +15,7 @@ public class KeyPair {
         this.publicKey = privateKey.getPublicKey();
     }
 
-    public Address getAddress(NetworkParams networkParams) {
-        return publicKey.getAddress(networkParams);
+    public Address getAddress(NetworkParams networkParams, boolean isP2SH) {
+        return publicKey.getAddress(networkParams, isP2SH);
     }
 }

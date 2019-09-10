@@ -16,7 +16,6 @@ import java.nio.ByteOrder;
 
 import static com.paytomat.btc.BitcoinException.CODE_INVALID_OUTPUT_ADDRESS;
 import static com.paytomat.btc.BitcoinException.CODE_SIGN_FAILED;
-import static com.paytomat.btc.BitcoinException.CODE_UNSUPPORTED;
 import static com.paytomat.btc.transaction.Script.OP_16;
 import static com.paytomat.btc.transaction.Script.OP_CHECKBLOCKATHEIGHT;
 import static com.paytomat.btc.transaction.Script.OP_CHECKSIG;
@@ -54,7 +53,7 @@ public class ScriptHelper {
             Address address = Address.fromString(addressStr, params);
             if (address == null)
                 throw new BitcoinException(CODE_INVALID_OUTPUT_ADDRESS, "Ivalid address");
-            if (address.getVersion() == params.getStandardAddressHeader()) {
+            if (address.isP2PKH()) {
                 //P2PKH
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(25);
                 baos.write(OP_DUP);
@@ -63,15 +62,13 @@ public class ScriptHelper {
                 baos.write(OP_EQUALVERIFY);
                 baos.write(OP_CHECKSIG);
                 return new Script(baos.toByteArray());
-            } else if (address.getVersion() == params.getMultisigAddressHeader()) {
+            } else {
                 //P2SH
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(25);
                 baos.write(OP_HASH160);
                 writeBytes(baos, address.getHash160());
                 baos.write(OP_EQUAL);
                 return new Script(baos.toByteArray());
-            } else {
-                throw new BitcoinException(CODE_UNSUPPORTED, "Unsupported address " + address);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -84,7 +81,7 @@ public class ScriptHelper {
             Address address = Address.fromString(addressStr, params);
             if (address == null) {
                 throw new BitcoinException(CODE_INVALID_OUTPUT_ADDRESS, "Ivalid address");
-            } else if (address.getVersion() == params.getStandardAddressHeader()) {
+            } else if (address.isP2PKH()) {
                 //P2PKH
                 byte[] subAddress = address.getHash160();
                 byte[] blockHeightBytes = encodeBlockHeight(blockHeight);
@@ -100,7 +97,7 @@ public class ScriptHelper {
                 writeBytes(baos, blockHeightBytes);
                 baos.write(OP_CHECKBLOCKATHEIGHT);
                 return new ZenScript(baos.toByteArray());
-            } else if (address.getVersion() == params.getMultisigAddressHeader()) {
+            } else {
                 //P2SH
                 String addrHex = address.getBytesHex();
                 String subAddressHex = addrHex.substring(4);
@@ -117,8 +114,6 @@ public class ScriptHelper {
                 baos.write(OP_CHECKBLOCKATHEIGHT);
                 return new ZenScript(baos.toByteArray());
 
-            } else {
-                throw new BitcoinException(CODE_UNSUPPORTED, "Unsupported address " + address);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -235,7 +230,8 @@ public class ScriptHelper {
             outputs = tx == null ? new Output[0] : tx.getOutputs();
         }
         Transaction unsignedTransaction = new Transaction(tx == null ? 1 : tx.getVersion(), unsignedInputs, outputs, tx == null ? 0 : tx.getLockTime());
-        if (tx.getVersion() == 12) unsignedTransaction.setPreviousBlockHash(tx.getPreviousBlockHash());
+        if (tx.getVersion() == 12)
+            unsignedTransaction.setPreviousBlockHash(tx.getPreviousBlockHash());
         if (bitcoinCash || sigVersion == SIGVERSION_WITNESS_V0) {
             if (tx == null) {
                 throw new RuntimeException("null tx");

@@ -3,14 +3,13 @@ package com.paytomat.btc;
 import com.paytomat.btc.network.NetworkParams;
 import com.paytomat.btc.network.NetworkParamsFactory;
 import com.paytomat.core.util.Base58;
-import com.paytomat.core.util.HashUtil;
-
-import org.bouncycastle.util.encoders.Hex;
+import com.paytomat.core.util.ByteSerializer;
 
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 
 import static com.paytomat.btc.BitcoinException.CODE_BAD_FORMAT;
+import static com.paytomat.btc.BitcoinException.CODE_UNSUPPORTED;
 
 /**
  * created by Alex Ivanov on 2019-02-12.
@@ -18,81 +17,79 @@ import static com.paytomat.btc.BitcoinException.CODE_BAD_FORMAT;
 public class Address {
 
     private static final int NUM_ADDRESS_HASH = 20;
-    private static final int NUM_ADDRESS_BYTES_SHORT = 21;
-    private static final int NUM_ADDRESS_BYTES_EXTENDED = 22;
-
-    public static Address fromString(String address) {
-        if (address == null || address.length() == 0) {
-            return null;
-        }
-        byte[] bytes = Base58.decodeChecked(address);
-        if (bytes == null || !validateBytesLength(bytes)) {
-            return null;
-        }
-        return new Address(bytes, address);
-    }
-
-    private static boolean validateBytesLength(byte[] bytes) {
-        return (bytes.length == NUM_ADDRESS_BYTES_SHORT || bytes.length == NUM_ADDRESS_BYTES_EXTENDED);
-    }
 
     public static Address fromString(String addressStr, String tokenSymbol, boolean isTestnet) {
         return fromString(addressStr, NetworkParamsFactory.getParams(tokenSymbol, isTestnet));
     }
 
     public static Address fromString(String addressStr, NetworkParams networkParams) {
-        Address address = fromString(addressStr);
-        if (address == null || !address.isValid(networkParams)) return null;
-        return address;
-    }
-
-    private final byte[] bytes;
-    private final String address;
-
-    private Address(byte[] addressBytes, String address) {
-        this.bytes = addressBytes;
-        this.address = address;
-    }
-
-    public Address(byte[] bytes, NetworkParams networkParams) {
-        if (bytes.length != NUM_ADDRESS_HASH) {
-            throw new BitcoinException(CODE_BAD_FORMAT, "Cannot create address from bytes");
+        if (addressStr == null || addressStr.length() == 0 || networkParams == null) {
+            throw new BitcoinException(CODE_BAD_FORMAT, "No data provided");
         }
-        byte[] headerBytes = BigInteger.valueOf(networkParams.getStandardAddressHeader()).toByteArray();
-        this.bytes = new byte[headerBytes.length + NUM_ADDRESS_HASH];
-        System.arraycopy(headerBytes, 0, this.bytes, 0, headerBytes.length);
-        System.arraycopy(bytes, 0, this.bytes, headerBytes.length, NUM_ADDRESS_HASH);
 
-        byte[] addressBytes = new byte[this.bytes.length + 4];
-        System.arraycopy(this.bytes, 0, addressBytes, 0, this.bytes.length);
-        byte[] checksum = HashUtil.doubleSha256(addressBytes, 0, this.bytes.length).firstFourBytes();
-        System.arraycopy(checksum, 0, addressBytes, this.bytes.length, 4);
-        this.address = Base58.encode(addressBytes);
+        byte[] bytes = Base58.decodeChecked(addressStr);
+        if (bytes == null || bytes.length <= NUM_ADDRESS_HASH) {
+            throw new BitcoinException(CODE_UNSUPPORTED, "Unsupported address " + addressStr);
+        }
+
+        byte[] hash = new byte[20];
+        System.arraycopy(bytes, bytes.length - NUM_ADDRESS_HASH, hash, 0, NUM_ADDRESS_HASH);
+        int headerSize = bytes.length - NUM_ADDRESS_HASH;
+        if (headerSize > 4) {
+            throw new BitcoinException(CODE_UNSUPPORTED, "Unsupported address " + addressStr);
+        }
+        byte[] header = new byte[4];
+        System.arraycopy(bytes, 0, header, 4 - headerSize, headerSize);
+        int networkHeader = ByteBuffer.wrap(header).getInt();
+
+        if (networkHeader == networkParams.getStandardAddressHeader()) {
+            return new Address(hash, networkParams, false);
+        } else if (networkHeader == networkParams.getMultisigAddressHeader()) {
+            return new Address(hash, networkParams, true);
+        } else {
+            throw new BitcoinException(CODE_UNSUPPORTED, "Unsupported address " + addressStr);
+        }
     }
 
-    private boolean isValid(NetworkParams network) {
-        int version = getVersion();
-        return validateBytesLength(bytes) && ((network.getStandardAddressHeader() == version || network.getMultisigAddressHeader() == version));
+    private final NetworkParams networkParams;
+    private final byte[] hash;
+    private final boolean p2sh;
+
+    public Address(byte[] hash, NetworkParams networkParams, boolean isP2SH) {
+        if (hash == null || networkParams == null)
+            throw new BitcoinException(CODE_BAD_FORMAT, "No data provided");
+        if (hash.length != NUM_ADDRESS_HASH)
+            throw new BitcoinException(CODE_BAD_FORMAT, "Cannot create address from bytes");
+
+        this.networkParams = networkParams;
+        this.p2sh = isP2SH;
+        this.hash = hash;
     }
 
-    public int getVersion() {
-        if (bytes.length == NUM_ADDRESS_BYTES_SHORT) return bytes[0];
-        else return ((bytes[0] << 8) | (bytes[1] & 0xFF));
+    public boolean isP2PKH() {
+        return !p2sh;
+    }
+
+    private ByteSerializer getAddressBytesWrapped() {
+        ByteSerializer serializer = ByteSerializer.create();
+        int header;
+        if (p2sh) header = networkParams.getMultisigAddressHeader();
+        else header = networkParams.getStandardAddressHeader();
+        serializer.write(BigInteger.valueOf(header).toByteArray());
+        return serializer.write(hash);
     }
 
     public byte[] getHash160() {
-        if (bytes.length == NUM_ADDRESS_BYTES_SHORT)
-            return Arrays.copyOfRange(bytes, 1, bytes.length);
-        else return Arrays.copyOfRange(bytes, 2, bytes.length);
+        return hash;
     }
 
     public String getBytesHex() {
-        return Hex.toHexString(bytes);
+        return getAddressBytesWrapped().toString();
     }
 
     @Override
     public String toString() {
-        return address;
+        return getAddressBytesWrapped().toBase58WithChecksum();
     }
 
 }
