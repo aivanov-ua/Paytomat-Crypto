@@ -16,7 +16,7 @@ import static com.paytomat.btc.BitcoinException.CODE_UNSUPPORTED;
  */
 public class Address {
 
-    private static final int NUM_ADDRESS_HASH = 20;
+    public static final int NUM_ADDRESS_HASH = 20;
 
     public static Address fromString(String addressStr, String tokenSymbol, boolean isTestnet) {
         return fromString(addressStr, NetworkParamsFactory.getParams(tokenSymbol, isTestnet));

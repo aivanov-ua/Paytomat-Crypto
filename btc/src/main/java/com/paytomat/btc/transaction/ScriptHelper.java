@@ -4,6 +4,7 @@ import com.paytomat.btc.Address;
 import com.paytomat.btc.BitcoinException;
 import com.paytomat.btc.network.NetworkParams;
 import com.paytomat.btc.network.NetworkParamsFactory;
+import com.paytomat.core.util.ByteSerializer;
 import com.paytomat.core.util.HashUtil;
 
 import org.bouncycastle.util.Arrays;
@@ -359,5 +360,14 @@ public class ScriptHelper {
             throw new IllegalArgumentException("decodeOpN " + opcode);
         }
         return opcode - (OP_TRUE - 1);
+    }
+
+    public static Script createP2WPKHOutputScript(byte[] hash) {
+        if (hash.length != Address.NUM_ADDRESS_HASH) throw new IllegalArgumentException();
+        return new Script(ByteSerializer.create()
+                .write((byte) 0)
+                .write((byte) hash.length)
+                .write(hash)
+                .serialize());
     }
 }

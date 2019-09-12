@@ -1,7 +1,7 @@
 package com.paytomat.btc;
 
 import com.paytomat.btc.network.NetworkParams;
-import com.paytomat.core.util.ByteSerializer;
+import com.paytomat.btc.transaction.ScriptHelper;
 import com.paytomat.core.util.HashUtil;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -33,7 +33,7 @@ public class PublicKey {
     public Address getAddress(NetworkParams networkParams, boolean isP2SH) {
         if (address == null || address.isP2PKH() == isP2SH) {
             if (isP2SH) {
-                byte[] program = ByteSerializer.create().write(new byte[]{0x00, 0x14}).write(getPubKeyHash()).serialize();
+                byte[] program = ScriptHelper.createP2WPKHOutputScript(getPubKeyHash()).bytes;
                 byte[] hash = HashUtil.sha256ripemd160(program);
                 address = new Address(hash, networkParams, true);
             } else {
