@@ -1,18 +1,18 @@
 package com.paytomat.btc.transaction;
 
 import com.paytomat.btc.BitcoinException;
+import com.paytomat.core.util.ByteSerializer;
+import com.paytomat.core.util.VarInt32;
 
-import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
 
 /**
  * created by Alex Ivanov on 7/18/18.
  */
-public class Transaction {
+public class Transaction extends Message {
 
     private final int version;
     private final Input[] inputs;
@@ -65,56 +65,82 @@ public class Transaction {
         if (withWitness && scriptWitnesses.length == 0) {
             withWitness = false;
         }
-        BitcoinOutputStream bos = new BitcoinOutputStream();
-        try {
-            bos.writeInt32(version);
-            if (withWitness) {
-                bos.write(0);
-                bos.write(1);
-            } else if (version == 12) {
-                bos.write(previousBlockHash);
-            }
-            bos.writeVarInt(inputs.length);
-            for (Input input : inputs) {
-                bos.write(Arrays.reverse(input.outPoint.hash));
-                bos.writeInt32(input.outPoint.index);
-                int scriptLen = input.scriptSig == null ? 0 : input.scriptSig.bytes.length;
-                bos.writeVarInt(scriptLen);
-                if (scriptLen > 0) {
-                    bos.write(input.scriptSig.bytes);
+        ByteSerializer serializer = ByteSerializer.create();
+        serializer.writeLE(version);
+        if (withWitness) {
+            serializer.write((byte) 0)
+                    .write((byte) 1);
+        } else if (version == 12) {
+            serializer.write(previousBlockHash);
+        }
+        serializer.write(inputs, true)
+                .write(outputs, true);
+        if (withWitness) {
+            for (byte[][] witness : scriptWitnesses) {
+                serializer.writeVarInt32(witness.length);
+                for (byte[] stackEntry : witness) {
+                    serializer.writeVarInt32(stackEntry.length);
+                    serializer.write(stackEntry);
                 }
-                bos.writeInt32(input.sequence);
-            }
-            bos.writeVarInt(outputs.length);
-            for (Output output : outputs) {
-                bos.writeInt64(output.value);
-                int scriptLen = output.script == null ? 0 : output.script.bytes.length;
-                bos.writeVarInt(scriptLen);
-                if (scriptLen > 0) {
-                    bos.write(output.script.bytes);
-                }
-            }
-            if (withWitness) {
-                for (byte[][] witness : scriptWitnesses) {
-                    bos.writeVarInt(witness.length);
-                    for (byte[] stackEntry : witness) {
-                        bos.writeVarInt(stackEntry.length);
-                        bos.write(stackEntry);
-                    }
-                }
-            }
-            bos.writeInt32(lockTime);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new BitcoinException(BitcoinException.CODE_BAD_FORMAT, "Cannot serialize tx");
-        } finally {
-            try {
-                bos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
-        return bos.toByteArray();
+        serializer.writeLE(lockTime);
+        return serializer.serialize();
+    }
+
+    private boolean hasWitnesses() {
+        return scriptWitnesses != null && scriptWitnesses.length > 0;
+    }
+
+    /**
+     * Gets the transaction weight as defined in BIP141.
+     */
+    public int getWeight() {
+        if (hasWitnesses()) {
+            final int baseSize = getBytes(false).length;
+            final int totalSize = getBytes(true).length;
+            return baseSize * 3 + totalSize;
+        } else {
+            return getMessageSize() * 4;
+        }
+    }
+
+    /**
+     * Gets the virtual transaction size as defined in BIP141.
+     */
+    public int getVsize() {
+        if (!hasWitnesses()) return getMessageSize();
+        return (getWeight() + 3) / 4; // round up
+    }
+
+    @Override
+    public byte[] serialize() {
+        return getBytes(hasWitnesses());
+    }
+
+    @Override
+    public int getMessageSize() {
+        int inputsSize = 0;
+        for (Input input : inputs) {
+            inputsSize += input.getMessageSize();
+        }
+        int outputSize = 0;
+        for (Output output : outputs) {
+            outputSize += output.getMessageSize();
+        }
+        int witnessesSize = 0;
+        if (hasWitnesses()) {
+            for (byte[][] witness : scriptWitnesses) {
+                witnessesSize += VarInt32.size(witness.length);
+                for (byte[] stackEntry : witness) {
+                    witnessesSize += VarInt32.size(stackEntry.length);
+                    witnessesSize += stackEntry.length;
+                }
+            }
+        }
+
+
+        return 4 + (hasWitnesses() ? 2 : 0) + (version == 12 ? previousBlockHash.length : 0) + VarInt32.size(inputs.length) + inputsSize + VarInt32.size(outputs.length) + outputSize + witnessesSize + 4; //Version(4) + optionalWitnessHeader(2?) + optionalBlockHash(size) + input count + inputs data + outputs size + output data +  witnesses +  lockTime(4)
     }
 
     public String toString() {

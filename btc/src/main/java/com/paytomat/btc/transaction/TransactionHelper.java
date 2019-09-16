@@ -68,7 +68,7 @@ public class TransactionHelper {
             throw new BitcoinException(BitcoinException.CODE_INVALID_OUTPUT_ADDRESS, "Output address is invalid", outputAddress);
         }
 
-        BaseTxInfo baseTxInfo = calcBaseTxInfo(unspentOutputs, feePerB, amountToSend, dust);
+        BaseTxInfo baseTxInfo = calcBaseTxInfo(unspentOutputs, feePerB, amountToSend, dust, transactionType);
 
         Output[] outputs;
 
@@ -101,9 +101,8 @@ public class TransactionHelper {
         return sign(outputToSpend, unsignedTx, transactionType, secureRandom);
     }
 
-    private static BaseTxInfo calcBaseTxInfo(List<UnspentOutputInfo> unspentOutputs, long feePerB,
-                                             long amountToSend, long dust) throws BitcoinException {
-        final boolean compressedPubKey = true;
+    private static BaseTxInfo calcBaseTxInfo(List<UnspentOutputInfo> unspentOutputs, long feePerB, long amountToSend,
+                                             long dust, TransactionType transactionType) throws BitcoinException {
         long fee = 0;
         long change = 0;
         long utxoValue = 0;
@@ -113,7 +112,7 @@ public class TransactionHelper {
             for (UnspentOutputInfo outputInfo : unspentOutputs) {
                 utxoValue += outputInfo.value;
             }
-            int txLen = getMaxTxSize(unspentOutputs, 1, compressedPubKey);
+            int txLen = getMaxTxSize(outputsToSpend.size(), 1, transactionType);
             fee = Convertor.calcMinimumFee(feePerB, txLen);
             amountToSend = utxoValue - fee;
         } else {
@@ -128,7 +127,7 @@ public class TransactionHelper {
                         fee += change;
                         change = 0;
                     }
-                    int txLen = getMaxTxSize(unspentOutputs, change > 0 ? 2 : 1, compressedPubKey);
+                    int txLen = getMaxTxSize(outputsToSpend.size(), change > 0 ? 2 : 1, transactionType);
                     tempFee = Convertor.calcMinimumFee(feePerB, txLen);
                     if (tempFee == fee) break;
                 }
@@ -154,18 +153,15 @@ public class TransactionHelper {
         return new BaseTxInfo(fee, change, amountToSend, outputsToSpend);
     }
 
-    public static int getMaxTxSize(List<UnspentOutputInfo> unspentOutputs, int outputCount, boolean isPubKeyCompressed) {
-        if (unspentOutputs == null || unspentOutputs.isEmpty()) {
+    public static int getMaxTxSize(int inputCount, int outputCount, TransactionType transactionType) {
+        if (inputCount == 0 || outputCount == 0) {
             throw new BitcoinException(CODE_NO_INPUT, "No information about tx inputs provided");
         }
-        int maxInputScriptLen = 73 + (isPubKeyCompressed ? 34 : 65);
-        //4 bytes - version
-        //1-9 bytes - utxo count, 1 should be enough
-        //? bytes - inputs
-        //1-9 bytes - output count, 1 will be enough
-        //? bytes - output
-        //4 bytes - lock time
-        return 10 + unspentOutputs.size() * (41 + maxInputScriptLen) + outputCount * 34;
+        if (transactionType == TransactionType.SEGWIT) {
+            return 11 + inputCount * 91 + outputCount * 32;
+        } else {
+            return 10 + inputCount * 148 + outputCount * 34;
+        }
     }
 
     private static Transaction sign(List<UnspentOutputInfo> unspentOutputs, Transaction unsignedTx, TransactionType txType, SecureRandom secureRandom) {
