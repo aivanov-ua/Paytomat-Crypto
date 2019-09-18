@@ -40,7 +40,7 @@ import static com.paytomat.btc.transaction.TransactionHelper.SIGVERSION_WITNESS_
  * created by Alex Ivanov on 7/19/18.
  */
 public class ScriptHelper {
-    static Script buildOutput(String addressStr, String tokenSymbol, boolean isTestNet, int blockHeight, String blockHash) throws BitcoinException {
+    public static Script buildOutput(String addressStr, String tokenSymbol, boolean isTestNet, int blockHeight, String blockHash) throws BitcoinException {
         if (tokenSymbol.toUpperCase().equals("ZEN")) {
             return buildOutputZenCash(addressStr, blockHeight, blockHash, isTestNet);
         } else {

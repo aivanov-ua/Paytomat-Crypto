@@ -14,6 +14,6 @@ public class BCDProdNetParams extends ProdNetParams {
     }
 
     BCDProdNetParams() {
-        super(999, 0x80, 0, 5, 1);
+        super(999, 0x80, 0, 0, 1);
     }
 }
