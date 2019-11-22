@@ -16,6 +16,6 @@ public class ZENProdNetParams extends ProdNetParams {
     }
 
     private ZENProdNetParams() {
-        super(121, 0x80, 0x2089, 0x2096, 1);
+        super(121, 0x80, 0x2089, 0x2096, 0);
     }
 }
