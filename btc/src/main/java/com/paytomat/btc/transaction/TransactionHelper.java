@@ -143,7 +143,7 @@ public class TransactionHelper {
                 throw new BitcoinException(CODE_NO_INPUT, "No utxo to spend");
             if (fee > MAX_ALLOWED_FEE)
                 throw new BitcoinException(CODE_FEE_IS_TOO_BIG, "Fee is too big", fee);
-            if (fee <= 0)
+            if (fee < 0)
                 throw new BitcoinException(CODE_FEE_IS_LESS_THAN_ZERO, "Incorrect fee", fee);
             if (change < 0)
                 throw new BitcoinException(CODE_CHANGE_IS_LESS_THEN_ZERO, "Incorrect change", change);
