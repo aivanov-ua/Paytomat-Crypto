@@ -68,7 +68,7 @@ public class TransactionHelper {
         if (Address.fromString(outputAddress, tokenSymbol, isTestnet) == null) {
             throw new BitcoinException(BitcoinException.CODE_INVALID_OUTPUT_ADDRESS, "Output address is invalid", outputAddress);
         }
-        if (feePerB <= NetworkParamsFactory.getParams(tokenSymbol, isTestnet).getMinFeePerByte())
+        if (feePerB < NetworkParamsFactory.getParams(tokenSymbol, isTestnet).getMinFeePerByte())
             throw new BitcoinException(CODE_FEE_IS_LESS_THAN_ZERO, "Incorrect fee", feePerB);
 
         BaseTxInfo baseTxInfo = calcBaseTxInfo(unspentOutputs, feePerB, amountToSend, dust, transactionType);
