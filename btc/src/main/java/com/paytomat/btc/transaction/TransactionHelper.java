@@ -3,6 +3,7 @@ package com.paytomat.btc.transaction;
 import com.paytomat.btc.Address;
 import com.paytomat.btc.BitcoinException;
 import com.paytomat.btc.Convertor;
+import com.paytomat.btc.network.NetworkParamsFactory;
 import com.paytomat.core.util.HashUtil;
 
 import org.bouncycastle.asn1.ASN1Integer;
@@ -67,6 +68,8 @@ public class TransactionHelper {
         if (Address.fromString(outputAddress, tokenSymbol, isTestnet) == null) {
             throw new BitcoinException(BitcoinException.CODE_INVALID_OUTPUT_ADDRESS, "Output address is invalid", outputAddress);
         }
+        if (feePerB <= NetworkParamsFactory.getParams(tokenSymbol, isTestnet).getMinFeePerByte())
+            throw new BitcoinException(CODE_FEE_IS_LESS_THAN_ZERO, "Incorrect fee", feePerB);
 
         BaseTxInfo baseTxInfo = calcBaseTxInfo(unspentOutputs, feePerB, amountToSend, dust, transactionType);
 
