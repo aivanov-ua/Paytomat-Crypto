@@ -6,5 +6,6 @@ package com.paytomat.btc.transaction;
 public enum TransactionType {
     LEGACY,
     BITCOIN_CASH,
+    HORIZEN,
     SEGWIT
 }

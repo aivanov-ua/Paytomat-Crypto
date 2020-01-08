@@ -122,19 +122,28 @@ public class TransactionHelper {
             for (UnspentOutputInfo outInfo : unspentOutputs) {
                 outputsToSpend.add(outInfo);
                 utxoValue += outInfo.value;
-                long tempFee = 0;
-                for (int i = 0; i < 3; i++) {
-                    fee = tempFee;
+                if (transactionType == TransactionType.HORIZEN) {
+                    fee = feePerB;
                     change = utxoValue - fee - amountToSend;
                     if (change < dust) {
                         fee += change;
                         change = 0;
                     }
-                    int txLen = getMaxTxSize(outputsToSpend.size(), change > 0 ? 2 : 1, transactionType);
-                    tempFee = Convertor.calcMinimumFee(feePerB, txLen);
-                    if (tempFee == fee) break;
+                } else {
+                    long tempFee = 0;
+                    for (int i = 0; i < 3; i++) {
+                        fee = tempFee;
+                        change = utxoValue - fee - amountToSend;
+                        if (change < dust) {
+                            fee += change;
+                            change = 0;
+                        }
+                        int txLen = getMaxTxSize(outputsToSpend.size(), change > 0 ? 2 : 1, transactionType);
+                        tempFee = Convertor.calcMinimumFee(feePerB, txLen);
+                        if (tempFee == fee) break;
+                    }
+                    fee = tempFee;
                 }
-                fee = tempFee;
                 if (utxoValue >= amountToSend + fee) break;
             }
             if (amountToSend > utxoValue - fee) {
