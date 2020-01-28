@@ -16,7 +16,7 @@ import static com.paytomat.core.Constants.SECP256k1_CURVE;
 /**
  * created by Alex Ivanov on 2019-05-09.
  */
-public class Signature {
+public class Signer {
 
     public static byte[] signMessage(byte[] message, PrivateKey privateKey) {
         return signMessage(message, privateKey.getBytes());

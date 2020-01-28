@@ -48,4 +48,16 @@ public class TransactionTest {
         Assert.assertEquals("ca01f0625dee0a4a2a2c87fa0a210a1423d24501f6af33c6dcf6654d1b6bdd1e0f8c327612090a03424e4210a08d0612210a14d310bc7bec97db8deb71bebd441d8174f9baaaf112090a03424e4210a08d06126f0a26eb5ae987210209410fcf16a8cc2867e33f56c36678705ce8083b1cd6cdee7932a26788f3ae2d1240245b6239c8e51e244e7a4f7f8fab85fe81a3859a7fe6c0d9e373b4c23072072506804ea8a2222b1c631fc1d5f6b3618346c593d8c0fddfddd623b6eb9296c5ff18ec25200b1a0548656c6c6f2001",
                 Hex.toHexString(encodedTx));
     }
+
+    @Test
+    public void testTx3() {
+        String memo = "100243966";
+        long source = 1;
+        byte[] data = null;
+        TransactionAssembler assembler = new TransactionAssembler("Binance-Chain-Tigris", 15555, 0L);
+        PrivateKey pk = new PrivateKey(Hex.decode("835c418a8898bb665052010aa469b92e443b6a93f327e1bb162594bf511eb746"), true);
+        byte[] encodedTx = assembler.assemble(memo, source, data, "bnb197sq8969w79985ugqg5jvjl8sqm6mjdd3ny7gn", "bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23", 100437500, "BNB", pk);
+        Assert.assertEquals("d001f0625dee0a4c2a2c87fa0a220a142fa0039745778a53d3880229264be78037adc9ad120a0a03424e4210fc9bf22f12220a148ea70d7d2ea8a14ba2b33d18d5dfbd6fae0a6ea8120a0a03424e4210fc9bf22f126f0a26eb5ae987210209410fcf16a8cc2867e33f56c36678705ce8083b1cd6cdee7932a26788f3ae2d1240891b97f6e40f0d1142effce2f81648d9b45aa9662654539efee5c2d194e6d7d810a2f3db7ecad11507940797d3caa35cb09e156d547913deff67074968738ce118c37920001a093130303234333936362001",
+                Hex.toHexString(encodedTx));
+    }
 }

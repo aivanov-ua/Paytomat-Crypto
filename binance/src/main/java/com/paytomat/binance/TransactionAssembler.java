@@ -31,7 +31,7 @@ public class TransactionAssembler {
     }
 
     byte[] sign(SignData msg, PrivateKey privateKey) {
-        return Signature.signMessage(msg.toByteArray(), privateKey);
+        return Signer.signMessage(msg.toByteArray(), privateKey);
     }
 
     byte[] encodeSignature(byte[] signatureBytes, PrivateKey privateKey) {
