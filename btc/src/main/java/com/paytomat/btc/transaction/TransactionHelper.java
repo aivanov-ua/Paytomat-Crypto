@@ -125,7 +125,9 @@ public class TransactionHelper {
                 if (transactionType == TransactionType.HORIZEN) {
                     fee = feePerB;
                     change = utxoValue - fee - amountToSend;
-                    if (change < dust) {
+                    if (change < 0) {
+                        continue;
+                    } else if (change < dust) {
                         fee += change;
                         change = 0;
                     }
