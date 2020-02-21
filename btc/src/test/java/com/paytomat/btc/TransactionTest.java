@@ -1,5 +1,8 @@
 package com.paytomat.btc;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.paytomat.btc.model.UtxoModel;
 import com.paytomat.btc.transaction.Transaction;
 import com.paytomat.btc.transaction.TransactionHelper;
 import com.paytomat.btc.transaction.TransactionType;
@@ -14,11 +17,17 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * created by Alex Ivanov on 2019-09-13.
@@ -184,6 +193,39 @@ public class TransactionTest {
     private void logTx(Transaction tx) {
         System.out.println("Signed raw tx size = " + tx.getMessageSize());
         System.out.println("Signed tx vsize = " + tx.getVsize());
+    }
+
+    @Test
+    public void testMultiInputHorizenTx() throws IOException, NoSuchAlgorithmException {
+        String file = FileUtil.readFile("horizen_utxo.json", getClass());
+
+        Type type = new TypeToken<Map<String, UtxoModel>>() {
+        }.getType();
+        Map<String, UtxoModel> utxoList = new Gson().fromJson(file, type);
+
+        List<UnspentOutputInfo> formedUtxo = new ArrayList<>(utxoList.size());
+        for (UtxoModel utxo : utxoList.values()) {
+            formedUtxo.add(new UnspentOutputInfo.Builder()
+                    .withPrivateKeyWif("L1bGqBPubQp6MZEKYsqm2oFgqxz4uKXtCt2P5U2VCERho2vXnPvh")
+                    .withTxHash(utxo.txHex)
+                    .withZenScript(utxo.subScriptHex)
+                    .withValue(utxo.value)
+                    .withOutputIndex((int) utxo.outputIndex)
+                    .build());
+        }
+
+        Transaction transaction = new Transaction.Builder("ZEN")
+                .withUnspentInfo(formedUtxo)
+                .withOutputAddress("znpCfC3GpBfr93SHzAm74KfiYsTJBbDrs5r")
+                .withChangeAddress("zna4KRrpTCT6aqt95Axoxst7pjveBC1n4sS")
+                .withAmount(Convertor.parseValue("0.01452371", BigDecimal.TEN.pow(8)))
+                .withFeePerB(10000)
+                .withTransactionType(TransactionType.HORIZEN)
+                .withDust(546L)
+                .withTestNetwork(false)
+                .build(SecureRandom.getInstanceStrong());
+
+        System.out.println(transaction);
     }
 
 }
