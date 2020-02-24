@@ -7,6 +7,7 @@ import com.paytomat.core.util.HashUtil;
 import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -43,16 +44,18 @@ public class HDNode {
     private byte[] publicKey;
     private final byte[] chainCode;
     private final HDPath path;
+    private final int parentFingerprint;
 
     private HDNode(byte[] privateKey, byte[] chainCode) {
-        this(privateKey, chainCode, HDPath.ROOT);
+        this(privateKey, chainCode, HDPath.ROOT, 0);
     }
 
-    private HDNode(byte[] privateKey, byte[] chainCode, HDPath path) {
+    private HDNode(byte[] privateKey, byte[] chainCode, HDPath path, int parentFingerprint) {
         if (privateKey.length != 32) throw new GeneratorException("Wrong privateKey Size");
         this.privateKey = privateKey;
         this.chainCode = chainCode;
         this.path = path;
+        this.parentFingerprint = parentFingerprint;
     }
 
     public byte[] getPrivateKey() {
@@ -99,7 +102,7 @@ public class HDNode {
 
         // Make a 32 byte result where k is copied to the end
         byte[] privateKeyBytes = bigIntegerTo32Bytes(k);
-        return new HDNode(privateKeyBytes, lR, path.getChild(index & ~HARDENED_MARKER, isHardened));
+        return new HDNode(privateKeyBytes, lR, path.getChild(index & ~HARDENED_MARKER, isHardened), getFingerprint());
     }
 
     private byte[] bigIntegerTo32Bytes(BigInteger b) {
@@ -131,6 +134,37 @@ public class HDNode {
             publicKey = Q.getEncoded(true);
         }
         return publicKey;
+    }
+
+    private byte[] getIdentifier() {
+        return HashUtil.sha256ripemd160(getPublicKey());
+    }
+
+    private int getFingerprint() {
+        return ByteBuffer.wrap(Arrays.copyOfRange(getIdentifier(), 0, 4)).getInt();
+    }
+
+    int getParentFingerprint() {
+        return parentFingerprint;
+    }
+
+    byte getDepth() {
+        return path.getDepth();
+    }
+
+    int getIndex() {
+        return path.getValue();
+    }
+
+    byte[] getChainCode() {
+        return chainCode;
+    }
+
+    byte[] getPrivateKey33() {
+        byte[] priv33 = new byte[33];
+        byte[] priv = getPrivateKey();
+        System.arraycopy(priv, 0, priv33, 33 - priv.length, priv.length);
+        return priv33;
     }
 
     @Override

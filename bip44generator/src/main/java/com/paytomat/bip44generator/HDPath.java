@@ -10,6 +10,7 @@ public class HDPath {
 
     public static final HDPath ROOT = new HDPath();
     private static final String HARDENED_SYMBOL = "'";
+    private static final String PATH_SPLIT_SYMBOL = "/";
 
     private final HDPath parent;
     private final int pathIndex;
@@ -17,7 +18,7 @@ public class HDPath {
 
     public static HDPath valueOf(String path) {
         if (path == null || path.isEmpty()) return ROOT;
-        String[] subPaths = path.split("/");
+        String[] subPaths = path.split(PATH_SPLIT_SYMBOL);
         HDPath hdPath = ROOT;
         for (String subPath : subPaths) {
             if (subPath.equals("m")) continue;
@@ -67,10 +68,15 @@ public class HDPath {
         return ret;
     }
 
+    byte getDepth() {
+        int depth = toString().split(PATH_SPLIT_SYMBOL).length - 1;
+        return (byte) Math.max(depth, 0);
+    }
+
     @Override
     public String toString() {
         if (parent == null) return "m";
-        return parent.toString() + "/" + pathIndex + (isHardened ? HARDENED_SYMBOL : "");
+        return parent.toString() + PATH_SPLIT_SYMBOL + pathIndex + (isHardened ? HARDENED_SYMBOL : "");
     }
 
 }

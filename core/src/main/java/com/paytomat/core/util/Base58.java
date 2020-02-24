@@ -42,6 +42,7 @@ import java.util.Arrays;
  * </ul>
  */
 public class Base58 {
+
     public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
 
     private static final int[] INDEXES = new int[128];

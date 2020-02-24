@@ -17,6 +17,10 @@ public class ByteSerializer {
         return new ByteSerializer();
     }
 
+    public static ByteSerializer create(int initialSize) {
+        return new ByteSerializer(initialSize);
+    }
+
     private byte[] bytes;
     private int lastIndex = 0;
 
