@@ -104,8 +104,8 @@ public class TransactionHelper {
         return sign(outputToSpend, unsignedTx, transactionType, secureRandom);
     }
 
-    private static BaseTxInfo calcBaseTxInfo(List<UnspentOutputInfo> unspentOutputs, long feePerB, long amountToSend,
-                                             long dust, TransactionType transactionType) throws BitcoinException {
+    static BaseTxInfo calcBaseTxInfo(List<UnspentOutputInfo> unspentOutputs, long feePerB, long amountToSend,
+                                     long dust, TransactionType transactionType) throws BitcoinException {
         long fee = 0;
         long change = 0;
         long utxoValue = 0;

@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * created by Alex Ivanov on 7/19/18.
  */
-class BaseTxInfo {
+public class BaseTxInfo {
     final long amountForRecipient, change, fee;
     final List<UnspentOutputInfo> outputsToSpend;
 
