@@ -6,8 +6,8 @@ import java.util.List;
  * created by Alex Ivanov on 7/19/18.
  */
 public class BaseTxInfo {
-    final long amountForRecipient, change, fee;
-    final List<UnspentOutputInfo> outputsToSpend;
+    public final long amountForRecipient, change, fee;
+    public final List<UnspentOutputInfo> outputsToSpend;
 
     public BaseTxInfo(long fee, long change, long amountForRecipient, List<UnspentOutputInfo> outputsToSpend) {
         this.fee = fee;
