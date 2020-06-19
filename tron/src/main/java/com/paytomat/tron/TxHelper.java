@@ -11,7 +11,6 @@ import org.bouncycastle.util.encoders.Hex;
 import java.util.Calendar;
 import java.util.Objects;
 
-import static com.paytomat.tron.Constants.PRECISION_EXP;
 import static com.paytomat.tronj.protos.Protocol.Transaction.Contract.ContractType.TransferAssetContract;
 import static com.paytomat.tronj.protos.Protocol.Transaction.Contract.ContractType.TransferContract;
 
@@ -23,19 +22,18 @@ public class TxHelper {
 
     public static final String ASSET_NAME_TRX = "TRX";
 
-    public static String send(PrivateKey privateKey, String to, double amount, String refBlockBytes, String refBlockHash, String assetName) {
+    public static String send(PrivateKey privateKey, String to, long amount, String refBlockBytes, String refBlockHash, String assetName) {
         ByteString ownerBS = ByteString.copyFrom(new Address(privateKey, false).getBytes());
         ByteString toBS = ByteString.copyFrom(new Address(to, false).getBytes());
 
         Protocol.Transaction.Contract.Builder builder = Protocol.Transaction.Contract.newBuilder();
 
-        long amountLong = convertAmount(amount);
 
         if (Objects.equals(assetName, ASSET_NAME_TRX)) {
             Contract.TransferContract transfer = Contract.TransferContract.newBuilder()
                     .setOwnerAddress(ownerBS)
                     .setToAddress(toBS)
-                    .setAmount(amountLong)
+                    .setAmount(amount)
                     .build();
             builder.setType(TransferContract)
                     .setParameter(Any.pack(transfer));
@@ -45,7 +43,7 @@ public class TxHelper {
                     .setOwnerAddress(ownerBS)
                     .setToAddress(toBS)
                     .setAssetName(assetNameBs)
-                    .setAmount(amountLong)
+                    .setAmount(amount)
                     .build();
             builder.setType(TransferAssetContract)
                     .setParameter(Any.pack(transferAsset));
@@ -75,9 +73,5 @@ public class TxHelper {
                 .build()
                 .toByteArray();
         return Hex.toHexString(rawTx);
-    }
-
-    public static long convertAmount(double amount) {
-        return (long) (amount * PRECISION_EXP);
     }
 }

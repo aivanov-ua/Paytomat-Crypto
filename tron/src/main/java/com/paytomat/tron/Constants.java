@@ -7,8 +7,4 @@ public interface Constants {
 
     byte PREFIX_BYTE_MAINNET = 0x41;
     byte PREFIX_BYTE_TESTNET = (byte) 0xA0;
-
-    int PRECISION = 6;
-    long PRECISION_EXP = (long) Math.pow(10, PRECISION);
-
 }
