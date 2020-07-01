@@ -14,7 +14,7 @@ public class FormatUtil {
         format.setGroupingUsed(false);
         format.setMinimumFractionDigits(precision);
         format.setMaximumFractionDigits(precision);
-        format.setRoundingMode(RoundingMode.UP);
+        format.setRoundingMode(RoundingMode.HALF_UP);
         return Long.parseLong(format.format(quantity).replace(".", ""));
     }
 
